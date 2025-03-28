@@ -563,7 +563,7 @@ function displayResults(result) {
                 <div class="timeline">
                     ${result.actionSteps.map((step, index) => `
                         <div class="timeline-item">
-                            <div class="timeline-marker">Step ${index + 1}</div>
+                            <div class="timeline-marker">S${index + 1}</div>
                             <div class="timeline-content">${step}</div>
                         </div>
                     `).join('')}

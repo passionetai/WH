@@ -1,4 +1,9 @@
-/* styles.css - Apple-inspired Update */
+/* Hide navbar on mobile */
+@media (max-width: 768px) {
+    .navbar {
+        display: none;
+    }
+}/* styles.css - Apple-inspired Update */
 :root {
     --primary-color: #007AFF;
     --secondary-color: #34C759;
@@ -74,7 +79,9 @@
     color: white;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     border-radius: 18px;
-}
+    margin: 0.5rem;
+    transition: all 0.3s ease;
+  }
   
   .logo-title {
     display: flex;
@@ -493,13 +500,13 @@
   .hustle-card h3 {
     color: var(--primary-color);
     font-size: 1.5rem;
-    margin-top: 20px;
-    margin-bottom: 1.5rem;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 25px;
     font-family: var(--font-heading);
     font-weight: 700;
     line-height: 1.3;
-    text-align: center;
-    padding: 0 50px;
+    padding: 0 15px;
     letter-spacing: 0.3px;
     word-spacing: 1px;
     text-transform: capitalize;
@@ -553,10 +560,16 @@
   
   /* Create a separate class for Gemini loading output */
   #hustle-output .loading {
-    font-size: 3em;  /* 3x larger for hustle output only */
+    font-size: 2.5em;  /* Reduced from 3em */
     font-weight: bold;
-    color: #d63031;  /* Red color */
+    color: var(--primary-color);  /* Changed from red to primary color */
     text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    background: var(--glass-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.4;
   }
   
   /* Loading subtext styling */
@@ -599,7 +612,25 @@
     }
   
     .hustle-card {
-      padding: 1.5rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+  
+    .hustle-card h3 {
+      font-size: 1.3rem;
+      margin-top: 15px;
+      margin-bottom: 20px;
+      padding: 0 10px;
+    }
+  
+    .copy-button-container {
+      margin-bottom: 16px;
+      gap: 8px;
+    }
+  
+    .copy-hustle-btn, .save-hustle-btn, .share-hustle-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
     }
   }
   
@@ -951,9 +982,8 @@
 .copy-button-container {
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
-    margin-bottom: 10px;
-    width: 100%;
+    gap: 10px;
+    margin-bottom: 20px; /* Increased space between buttons and title */
 }
 
 .copy-hustle-btn, .save-hustle-btn, .share-hustle-btn {
@@ -1285,60 +1315,64 @@
 
 /* Prepare navbar styling for future addition */
 .navbar {
-  position: sticky;
-  top: 0;
-  background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  padding: 0.8rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 1000;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
 }
 
 .nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .nav-logo-img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  padding: 3px;
-  background: white;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
 }
 
 .logo-text {
-  font-family: 'Quicksand', sans-serif;
-  font-weight: 700;
-  font-size: 1.4rem;
-  color: var(--primary-color);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
 }
 
 .nav-links {
-  display: flex;
-  gap: 2rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+    display: flex;
+    list-style: none;
+    gap: 1rem;
 }
 
-.nav-links a {
-  color: var(--text-dark);
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s ease;
-  padding: 0.5rem 0;
-  position: relative;
+.nav-links li a {
+    color: var(--text-dark);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 600;
 }
 
-.nav-links a:hover {
-  color: var(--primary-color);
+.nav-links li a:hover {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--primary-color);
+}
+
+.nav-links li a[aria-current="page"] {
+    background: var(--primary-color);
+    color: white;
 }
 
 /* Media query for mobile responsiveness */
@@ -1394,23 +1428,26 @@
 
 .progress-bar {
     width: 100%;
+    max-width: 300px;
     height: 8px;
     background: #E5E5EA;
     border-radius: 4px;
-    margin-top: 1rem;
+    margin: 1.2rem auto 0;
+    overflow: hidden;
 }
 
 .progress-fill {
     width: 0%;
     height: 100%;
-    background: #34C759;
+    background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
     border-radius: 4px;
     transition: width 5s ease-in-out;
 }
 
 #loading-city {
     font-weight: bold;
-    color: #007AFF;
+    color: var(--accent-color);
+    display: inline-block;
 }
 
 .share-hustle-btn {
@@ -1951,7 +1988,7 @@ input:focus {
     backdrop-filter: blur(10px);
     width: 100%;
     max-width: 350px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -2010,4 +2047,418 @@ input:focus {
     .guide-step {
         max-width: 100%;
     }
+}
+
+/* Mobile Menu Styles */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.bar {
+    height: 3px;
+    width: 100%;
+    background-color: var(--primary-color);
+    border-radius: 10px;
+    transition: all 0.3s ease-in-out;
+}
+
+.menu-toggle.is-active .bar:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+
+.menu-toggle.is-active .bar:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-toggle.is-active .bar:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+/* Mobile Enhancements */
+@media (max-width: 768px) {
+  /* Mobile menu */
+  .menu-toggle {
+      display: flex;
+  }
+  
+  .nav-links {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 80%;
+      max-width: 300px;
+      height: 100vh;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      transition: right 0.3s ease-in-out;
+      padding: 2rem;
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      overflow-y: auto;
+      overflow-x: hidden;
+  }
+  
+  .nav-links.active {
+      right: 0;
+  }
+  
+  .nav-links li {
+      width: 100%;
+  }
+  
+  .nav-links li a {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 1rem;
+      font-size: 1.1rem;
+  }
+  
+  /* Body overlay for mobile menu */
+  body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      pointer-events: none;
+  }
+  
+  body.menu-open::after {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: all;
+  }
+
+  /* Enhanced header styling for mobile */
+  header {
+    padding: 2rem 1rem;
+    border-radius: 12px;
+    margin: 0 0.5rem;
+  }
+  
+  .logo-title {
+    gap: 0.5rem;
+  }
+  
+  .header-logo {
+    width: 60px;
+    height: 60px;
+  }
+  
+  h1 {
+    font-size: 2.2rem;
+  }
+  
+  .subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Navbar adjustments */
+  .navbar {
+    padding: 0.8rem 1rem;
+  }
+  
+  .nav-logo-img {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .logo-text {
+    font-size: 1.2rem;
+  }
+  
+  /* Enhanced Guide Steps for Mobile */
+  .how-to-guide {
+    gap: 16px;
+    margin: 25px auto;
+    padding: 0 15px;
+  }
+  
+  .guide-step {
+    padding: 18px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,255,255,0.4);
+    max-width: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transform: scale(1);
+  }
+  
+  .guide-step:hover, .guide-step:active {
+    transform: scale(1.02);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+  }
+  
+  .step-number {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .step-number:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 60%);
+  }
+  
+  .step-content h4 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.2px;
+  }
+  
+  .step-content h4 svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--accent-color);
+    stroke-width: 2.5px;
+  }
+  
+  .step-content p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #444;
+    margin: 0;
+    letter-spacing: 0.1px;
+  }
+  
+  /* Add subtle animations */
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  .guide-step:nth-child(1) {
+    animation: pulse 4s ease infinite;
+    animation-delay: 0.5s;
+  }
+  
+  .guide-step:nth-child(2) {
+    animation: pulse 4s ease infinite;
+    animation-delay: 1s;
+  }
+  
+  .guide-step:nth-child(3) {
+    animation: pulse 4s ease infinite;
+    animation-delay: 1.5s;
+  }
+  
+  /* Search container adjustments */
+  #search-container {
+    margin: 1.5rem auto;
+  }
+  
+  #city-input {
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    font-size: 1rem;
+    background-position: 12px center;
+    background-size: 16px;
+  }
+  
+  #get-hustle-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  /* Reduce popular cities to show only common ones on mobile */
+  .city-buttons-container {
+    gap: 0.6rem;
+    margin: 1rem 0;
+  }
+  
+  .city-btn {
+    width: 130px;
+    height: 40px;
+    font-size: 0.9rem;
+    padding: 0.6rem;
+  }
+  
+  /* Hustle cards for mobile */
+  .hustle-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .hustle-card h3 {
+    font-size: 1.3rem;
+  }
+  
+  /* Better handling of buttons on small screens */
+  .refresh-button-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .refresh-btn {
+    width: 100%;
+    max-width: 280px;
+    margin-left: 0 !important;
+  }
+  
+  /* Improved saved hustles link for mobile */
+  .saved-hustles-link {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Improved footer for mobile */
+  footer {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Scroll to top button positioning */
+  .scroll-top-btn {
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Hide skip link - it was removed from HTML */
+.skip-link {
+  display: none;
+}
+
+/* Mobile adjustments for loading display */
+@media (max-width: 768px) {
+  #hustle-output .loading {
+    font-size: 1.6em;
+    line-height: 1.3;
+    padding: 1.5rem 1rem;
+    margin: 0.5rem 0;
+    border-radius: 12px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    animation: breathing 2s ease-in-out infinite;
+  }
+  
+  @keyframes breathing {
+    0% { transform: scale(0.98); opacity: 0.8; }
+    50% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.98); opacity: 0.8; }
+  }
+  
+  /* Loading text animation */
+  .scanning-text {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .scanning-dots:after {
+    content: '...';
+    position: relative;
+    display: inline-block;
+    animation: dotAnimation 1.5s infinite;
+    letter-spacing: 1px;
+  }
+  
+  @keyframes dotAnimation {
+    0% { content: '.'; }
+    33% { content: '..'; }
+    66% { content: '...'; }
+    100% { content: '.'; }
+  }
+  
+  .loading-subtext {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  
+  .progress-bar {
+    height: 6px;
+    margin-top: 1rem;
+    max-width: 250px;
+  }
+  
+  .progress-fill {
+    animation: pulse-animation 1.5s infinite;
+  }
+  
+  @keyframes pulse-animation {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+  }
+  
+  /* Style for city name in loading */
+  #loading-city {
+    color: var(--accent-color);
+    font-weight: 700;
+    display: inline-block;
+  }
+}
+
+@media (max-width: 768px) {
+  /* ... existing mobile styles ... */
+  
+  .timeline-marker {
+    min-width: 30px;
+    padding: 0.3rem;
+    border-radius: 5px;
+    font-size: 0.85rem;
+  }
+  
+  .timeline-item {
+    padding: 0.7rem;
+    margin-bottom: 0.7rem;
+    align-items: center;
+  }
+  
+  .timeline-content {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  
+  /* ... other mobile styles ... */
+}
+
+/* Add this to prevent horizontal scrolling on mobile */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Modify body.menu-open to fix position when menu is active */
+body.menu-open {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }

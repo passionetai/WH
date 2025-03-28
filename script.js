@@ -125,7 +125,7 @@ function createHustleCard(hustle, city, isGeminiResponse = true) {
                         <div class="timeline">
                             ${hustle.actionPlan.map(((plan, planIndex) => `
                                 <div class="timeline-item">
-                                    <div class="timeline-marker">W${planIndex + 1}</div>
+                                    <div class="timeline-marker">S${planIndex + 1}</div>
                                     <div class="timeline-content">${plan}</div>
                                 </div>
                             `)).join("")}
@@ -1446,7 +1446,7 @@ function createSavedCardHTML(hustle, hustlesArray) {
                 <div class="timeline">
                     ${hustle.actionPlan.map(((plan, planIndex) => `
                         <div class="timeline-item">
-                            <div class="timeline-marker">W${planIndex + 1}</div>
+                            <div class="timeline-marker">S${planIndex + 1}</div>
                             <div class="timeline-content">${plan}</div>
                         </div>
                     `)).join("")}
@@ -1510,10 +1510,16 @@ function updateProgressBar() {
     // Reset the progress bar to 0%
     progressFill.style.width = '0%';
     
-    // Set up timing for 20% increments every second
-    let progress = 0;
+    // For mobile, use a smoother animation with smaller increments
+    const isMobile = window.innerWidth <= 768;
+    const incrementSize = isMobile ? 10 : 20;
+    const intervalTime = isMobile ? 700 : 1000;
+    
+    // Start with lower progress on mobile for a more gradual feeling
+    let progress = isMobile ? 5 : 0;
+    
     const interval = setInterval(() => {
-        progress += 20;
+        progress += incrementSize;
         
         if (progress > 100) {
             progress = 100;
@@ -1522,12 +1528,17 @@ function updateProgressBar() {
         
         progressFill.style.width = `${progress}%`;
         
+        // Add pulsing effect for mobile after 50% progress
+        if (isMobile && progress >= 50 && !progressFill.classList.contains('pulsing')) {
+            progressFill.style.animation = 'pulse-animation 1.5s infinite';
+        }
+        
         // Clear interval after reaching 100%
         if (progress >= 100) {
             clearInterval(interval);
             window.progressInterval = null;
         }
-    }, 1000); // Update every 1 second (5 updates over 5 seconds)
+    }, intervalTime);
     
     // Store the interval ID so it can be cleared if needed
     window.progressInterval = interval;
@@ -1832,7 +1843,7 @@ function createCardHTML(hustle, hustlesArray) {
                 <div class="timeline">
                     ${hustle.actionPlan.map(((plan, planIndex) => `
                         <div class="timeline-item">
-                            <div class="timeline-marker">W${planIndex + 1}</div>
+                            <div class="timeline-marker">S${planIndex + 1}</div>
                             <div class="timeline-content">${plan}</div>
                         </div>
                     `)).join("")}
@@ -1887,3 +1898,102 @@ function createCardHTML(hustle, hustlesArray) {
         </div>
     `;
 }
+
+// Update the function that shows loading state in hustle output
+function showHustleLoading(city) {
+    const hustleOutput = document.getElementById('hustle-output');
+    hustleOutput.style.display = 'block';
+    hustleOutput.innerHTML = `
+        <div class="loading" aria-live="polite">
+            <div>
+                Scanning <span class="scanning-text">hustle opportunities</span> in 
+                <span id="loading-city">${city}</span><span class="scanning-dots"></span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+        <p class="loading-subtext">Analyzing local markets and demographics...</p>
+    `;
+    
+    // Start progress bar animation
+    setTimeout(() => {
+        const progressFill = document.querySelector('.progress-fill');
+        if (progressFill) {
+            progressFill.style.width = '30%';
+        }
+    }, 500);
+    
+    setTimeout(() => {
+        const progressFill = document.querySelector('.progress-fill');
+        if (progressFill) {
+            progressFill.style.width = '70%';
+        }
+    }, 1500);
+}
+
+// After the DOMContentLoaded event listener section, add a function to handle mobile menu scrolling
+
+// Store scroll position when menu opens
+let scrollPosition = 0;
+
+// Enhance mobile menu functionality to properly handle scrolling
+function setupMobileMenu() {
+    const menuToggle = document.getElementById('mobile-menu');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (!menuToggle || !navLinks) return;
+    
+    menuToggle.addEventListener('click', function() {
+        // Toggle active classes
+        this.classList.toggle('is-active');
+        navLinks.classList.toggle('active');
+        
+        // Handle body class and scroll position
+        if (!document.body.classList.contains('menu-open')) {
+            // Menu is opening
+            scrollPosition = window.pageYOffset;
+            document.body.classList.add('menu-open');
+            document.body.style.top = `-${scrollPosition}px`;
+        } else {
+            // Menu is closing
+            document.body.classList.remove('menu-open');
+            document.body.style.top = '';
+            window.scrollTo(0, scrollPosition);
+        }
+    });
+    
+    // Close menu when clicking a link
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            navLinks.classList.remove('active');
+            menuToggle.classList.remove('is-active');
+            
+            // Restore scroll position
+            document.body.classList.remove('menu-open');
+            document.body.style.top = '';
+            window.scrollTo(0, scrollPosition);
+        });
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (navLinks.classList.contains('active') && 
+            !navLinks.contains(event.target) && 
+            !menuToggle.contains(event.target)) {
+            navLinks.classList.remove('active');
+            menuToggle.classList.remove('is-active');
+            
+            // Restore scroll position
+            document.body.classList.remove('menu-open');
+            document.body.style.top = '';
+            window.scrollTo(0, scrollPosition);
+        }
+    });
+}
+
+// Call the function when the document is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    setupMobileMenu();
+    // ... other existing code ...
+});
