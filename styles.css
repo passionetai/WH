@@ -277,8 +277,8 @@
     justify-content: center;
     text-align: center;
     overflow: hidden;
-    position: relative;
-    z-index: 1;
+    position: relative; /* Ensure relative positioning for the absolute buttons */
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .city-btn::before {
@@ -463,7 +463,6 @@
     min-width: 300px;
     background: var(--glass-bg);
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border-radius: 16px;
     padding: 2rem;
     padding-top: 3rem; /* Increased top padding to make room for buttons */
@@ -1172,48 +1171,6 @@
     position: relative;
 }
 
-/* Navigation styling */
-.main-nav {
-  margin-top: 1rem;
-  text-align: center;
-}
-
-.saved-hustles-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background-color: white;
-  color: var(--primary-color);
-  padding: 0.6rem 1.2rem;
-  border-radius: 50px;
-  text-decoration: none;
-  font-weight: bold;
-  font-family: var(--font-primary);
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.saved-hustles-link svg {
-  transition: all 0.3s ease;
-}
-
-.saved-hustles-link:hover {
-  background-color: var(--primary-color);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-}
-
-.saved-hustles-link:hover svg {
-  fill: white;
-  stroke: white;
-}
-
-.saved-hustles-link:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
 /* Saved hustles page styles */
 #saved-hustles-output {
     padding: 40px 10px 2rem 10px;
@@ -1306,95 +1263,6 @@
     padding: 0.5rem 1.5rem;
     border-radius: 50px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-/* Prepare navbar styling for future addition */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-}
-
-.nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.nav-logo-img {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
-
-.logo-text {
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: 1.4rem;
-    color: var(--primary-color);
-    transition: all 0.3s ease;
-}
-
-.nav-links {
-    display: flex;
-    list-style: none;
-    gap: 1rem;
-}
-
-.nav-links li a {
-    color: var(--text-dark);
-    text-decoration: none;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    font-weight: 600;
-}
-
-.nav-links li a:hover {
-    background: rgba(0, 122, 255, 0.1);
-    color: var(--primary-color);
-}
-
-.nav-links li a[aria-current="page"] {
-    background: var(--primary-color);
-    color: white;
-}
-
-/* Media query for mobile responsiveness */
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    padding: 1rem;
-  }
-  
-  .nav-logo {
-    margin-bottom: 1rem;
-  }
-  
-  .nav-links {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.8rem;
-  }
-}
-
-#particles-js { 
-  position: fixed; 
-  top: 0; 
-  left: 0; 
-  width: 100%; 
-  height: 100%; 
-  z-index: -1; 
 }
 
 /* Loader styling */
@@ -1779,7 +1647,7 @@
   opacity: 0;
   height: 0;
   overflow: hidden;
-  transition: all 0.5s ease;
+  transition: opacity 0.5s ease, height 0.5s ease;
 }
 
 #calculator-results.show {
