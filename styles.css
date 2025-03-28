@@ -277,8 +277,8 @@
     justify-content: center;
     text-align: center;
     overflow: hidden;
-    position: relative;
-    z-index: 1;
+    position: relative; /* Ensure relative positioning for the absolute buttons */
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .city-btn::before {
@@ -2240,7 +2240,6 @@ input:focus {
     width: 20px;
     height: 20px;
     stroke: var(--accent-color);
-    stroke-width: 2.5px;
   }
   
   .step-content p {
@@ -2253,9 +2252,9 @@ input:focus {
   
   /* Add subtle animations */
   @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% { transform: scale(0.98); }
+    50% { transform: scale(1); }
+    100% { transform: scale(0.98); }
   }
   
   .guide-step:nth-child(1) {
@@ -2456,4 +2455,40 @@ body.menu-open {
   width: 100%;
   height: 100%;
   overflow: hidden;
+}
+
+/* Adjust nav styles for mobile: remove hamburger menu CSS, display links inline, reduce font size. */
+@media (max-width: 768px) {
+  /* Mobile menu - adjusted for inline display */
+  /* .menu-toggle removed as element is gone from HTML */
+
+  .nav-links {
+    display: flex; /* Keep links visible and inline */
+    flex-direction: row; /* Align items horizontally */
+    justify-content: flex-end; /* Align items to the right */
+    align-items: center;
+    width: auto; /* Allow width to adjust based on content */
+    position: static; /* Remove absolute positioning */
+    background: none; /* Remove background */
+    box-shadow: none; /* Remove shadow */
+    padding: 0; /* Remove padding */
+    flex-grow: 1; /* Allow links container to take available space */
+  }
+
+  .nav-links li {
+    margin: 0 0.5rem; /* Reduce margin between items */
+  }
+
+  .nav-links a {
+    padding: 0.5rem 0; /* Adjust padding */
+    font-size: 0.9rem; /* Slightly reduce font size */
+    color: var(--text-dark); /* Ensure text color is appropriate */
+  }
+
+  /* Remove .nav-links.active as toggle is gone */
+
+  .navbar {
+    padding: 0.5rem 1rem; /* Adjust navbar padding if needed */
+    flex-wrap: nowrap; /* Prevent wrapping */
+  }
 }

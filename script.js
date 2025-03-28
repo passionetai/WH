@@ -292,7 +292,7 @@ function renderHustles(hustles, city, isGeminiResponse, outputElement) {
             <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
             <line x1="9" y1="9" x2="9.01" y2="9"></line>
             <line x1="15" y1="9" x2="15.01" y2="9"></line>
-        </svg>
+            </svg>
         Get More Diverse Hustle
     `;
     refreshBtnContainer.appendChild(moreDiverseBtn);
@@ -1067,26 +1067,933 @@ document.addEventListener("DOMContentLoaded", function() {
     // Initialize particles
     initParticles();
     
-    // Setup mobile menu (should run on all pages)
-    setupMobileMenu(); 
-    
-    // Setup scroll-to-top button (should run on all pages)
-    initScrollToTopButton(); 
-    
-    // Check if we are on the main page (index.html)
-    if (document.getElementById('search-form')) {
-        setupMainPageListeners();
+    // Clear and hide the hustle output on initial load
+    const hustleOutput = document.getElementById("hustle-output");
+    if (hustleOutput) {
+        hustleOutput.innerHTML = "";
+        hustleOutput.style.display = "none";
     }
-
-    // Setup listeners for saved hustles page
-    if (document.getElementById('saved-hustles-container')) {
+    
+    // Setup event listeners for main page
+    setupMainPageListeners();
+    
+    // Check if we're on the saved hustles page
+    const savedHustlesOutput = document.getElementById("saved-hustles-output");
+    if (savedHustlesOutput) {
         loadSavedHustles();
     }
+});
 
-    // Note: quiz.js and calculator.js handle their own specific initializations
-    // within their own DOMContentLoaded listeners, which is okay as long as 
-    // they don't conflict with the common setup here.
+function setupMainPageListeners() {
+    const cityInput = document.getElementById("city-input");
+    const getHustleBtn = document.getElementById("get-hustle-btn");
+    const cityBtns = document.querySelectorAll(".city-btn");
+    
+    if (!cityInput || !getHustleBtn) return; // Not on the main page
+    
+    // Prevent any form submission
+    const searchForm = cityInput.closest('form');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            return false;
+        });
+    }
+    
+    // Debounce the search button click
+    let lastClickTime = 0;
+    getHustleBtn.addEventListener("click", function(e) {
+        e.preventDefault(); // Prevent any default actions
+        
+        // Debounce: ignore clicks that happen too quickly
+        const now = Date.now();
+        if (now - lastClickTime < 500) { // 500ms debounce time
+            return;
+        }
+        lastClickTime = now;
+        
+        const cityName = cityInput.value.trim();
+        if (cityName) {
+            document.getElementById("hustle-output").style.display = "block";
+            fetchHustleData(cityName);
+        } else {
+            showError("Please enter a city name");
+            scrollToHustleOutput();
+        }
+    });
+    
+    cityBtns.forEach(btn => {
+        btn.addEventListener("click", async function(e) {
+            e.preventDefault(); // Prevent any default actions
+            
+            // If a search is already in progress, ignore
+            if (window.searchInProgress) {
+                return;
+            }
+            
+            const originalText = this.textContent;
+            cityBtns.forEach(b => {
+                b.disabled = true;
+                b.style.cursor = "not-allowed";
+            });
+            this.textContent = "Loading...";
+            this.classList.add("loading");
+            
+            cityBtns.forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+            
+            const cityName = this.getAttribute("data-city");
+            cityInput.value = cityName;
+            
+            try {
+                document.getElementById("hustle-output").style.display = "block";
+                await fetchHustleData(cityName);
+                document.getElementById("hustle-output").scrollIntoView({behavior: "smooth"});
+            } finally {
+                this.textContent = originalText;
+                this.classList.remove("loading");
+                cityBtns.forEach(b => {
+                    b.disabled = false;
+                    b.style.cursor = "pointer";
+                });
+            }
+        });
+    });
+    
+    cityInput.addEventListener("keypress", async function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            // Don't trigger if a search is already in progress
+            if (!window.searchInProgress) {
+                document.getElementById("get-hustle-btn").click();
+                scrollToHustleOutput();
+            }
+        }
+    });
+}
 
-}); // End of the single consolidated listener
+// Function to load and display saved hustles
+function loadSavedHustles() {
+    const savedHustlesOutput = document.getElementById("saved-hustles-output");
+    const savedHustles = localStorage.getItem("savedHustles") ? 
+        JSON.parse(localStorage.getItem("savedHustles")) : [];
+    
+    if (savedHustles.length === 0) {
+        savedHustlesOutput.innerHTML = `
+            <div class="no-saved-hustles">
+                <p>You haven't saved any hustles yet!</p>
+                <a href="index.html" class="back-to-home">Find hustles to save</a>
+            </div>
+        `;
+        return;
+    }
+    
+    // Create container for the cards
+    const cardsContainer = document.createElement("div");
+    cardsContainer.className = "hustle-cards-container";
+    savedHustlesOutput.appendChild(cardsContainer);
+    
+    // Create filter container
+    const filterContainer = document.createElement("div");
+    filterContainer.id = "filter-container";
+    filterContainer.innerHTML = `
+        <label for="difficulty-filter">Filter by Difficulty:</label>
+        <select id="difficulty-filter">
+            <option value="all">All Difficulties</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+    `;
+    savedHustlesOutput.insertBefore(filterContainer, cardsContainer);
+    
+    // Render the saved hustles
+    renderFilteredHustles(savedHustles, cardsContainer, savedHustles);
+    
+    // Setup event listener for difficulty filter
+    document.getElementById("difficulty-filter").addEventListener("change", function() {
+        const selectedDifficulty = this.value;
+        
+        let filteredHustles = selectedDifficulty === "all" ? 
+            savedHustles : 
+            savedHustles.filter(hustle => hustle.difficulty.toLowerCase() === selectedDifficulty);
+        
+        renderFilteredHustles(filteredHustles, cardsContainer, savedHustles);
+        setupSavedHustlesEventListeners(savedHustles);
+    });
+    
+    // Setup event listeners for the cards
+    setupSavedHustlesEventListeners(savedHustles);
+}
 
-// ... rest of the code remains the same ...
+// Function to set up event listeners for saved hustles
+function setupSavedHustlesEventListeners(hustlesArray) {
+    // Set up copy button event listeners
+    document.querySelectorAll(".copy-hustle-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const index = parseInt(this.getAttribute("data-hustle-index"));
+            const hustle = hustlesArray[index];
+            if (hustle) {
+                const copyText = formatHustleForCopy(hustle);
+                navigator.clipboard.writeText(copyText).then(() => {
+                    const originalHTML = this.innerHTML;
+                    this.classList.add("copied");
+                    this.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Copied!
+                    `;
+                    setTimeout(() => {
+                        this.innerHTML = originalHTML;
+                        this.classList.remove("copied");
+                    }, 2000);
+                }).catch(error => {
+                    console.error("Failed to copy text: ", error);
+                });
+            }
+        });
+    });
+    
+    // Set up share button event listeners
+    document.querySelectorAll('.share-hustle-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-hustle-index'));
+            const hustle = hustlesArray[index];
+            
+            if (hustle) {
+                // Create shareable content
+                const title = `Check out this hustle idea: ${hustle.name}`;
+                const text = `${hustle.summary}\n\nProfitability: ${hustle.profitability}\nDifficulty: ${hustle.difficulty}`;
+                const hustleTitle = hustle.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+                const shareUrl = `https://wehustle.it.com/?hustle=${encodeURIComponent(hustleTitle)}`;
+                
+                // Use Web Share API if available
+                if (navigator.share) {
+                    navigator.share({
+                        title: title,
+                        text: text,
+                        url: shareUrl
+                    })
+                    .then(() => {
+                        console.log('Shared successfully');
+                    })
+                    .catch(err => {
+                        console.error('Share failed:', err);
+                        // Fall back to clipboard if share fails
+                        fallbackToClipboard();
+                    });
+                } else {
+                    // Fallback for browsers without Web Share API
+                    fallbackToClipboard();
+                }
+                
+                // Fallback function to copy to clipboard
+                function fallbackToClipboard() {
+                    const shareText = `${title}\n\n${text}\n\n${shareUrl}`;
+                    navigator.clipboard.writeText(shareText)
+                        .then(() => {
+                            alert("Link copied to clipboard!");
+                            
+                            // Success feedback on button
+                            const originalHTML = button.innerHTML;
+                            button.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                Copied!
+                            `;
+                            setTimeout(() => {
+                                button.innerHTML = originalHTML;
+                            }, 2000);
+                        })
+                        .catch(err => {
+                            console.error('Could not copy link: ', err);
+                            alert('Error copying link to clipboard');
+                        });
+                }
+            }
+        });
+    });
+    
+    // Set up delete button event listeners
+    document.querySelectorAll(".delete-hustle-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const index = parseInt(this.getAttribute("data-hustle-index"));
+            const hustle = hustlesArray[index];
+            
+            if (hustle && confirm(`Are you sure you want to delete "${hustle.name}"?`)) {
+                // Remove hustle from array
+                const savedHustles = localStorage.getItem("savedHustles") ? 
+                    JSON.parse(localStorage.getItem("savedHustles")) : [];
+                
+                const updatedHustles = savedHustles.filter(h => h.name !== hustle.name);
+                localStorage.setItem("savedHustles", JSON.stringify(updatedHustles));
+                
+                // Reload the page to refresh the list
+                window.location.reload();
+            }
+        });
+    });
+}
+
+// Function to render hustles based on filter
+function renderFilteredHustles(filteredHustles, container, allHustles) {
+    // Clear container
+    container.innerHTML = "";
+    
+    // If no hustles match the filter, show a message
+    if (filteredHustles.length === 0) {
+        container.innerHTML = `
+            <div class="missing-section" style="width: 100%;">
+                <p class="missing-text">No hustles found with the selected difficulty</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Determine if we're on the saved hustles page
+    const isOnSavedPage = document.getElementById("saved-hustles-output") !== null;
+    
+    // Create cards for each filtered hustle
+    filteredHustles.forEach(hustle => {
+        // Normalize difficulty to lowercase
+        const normalizedDifficulty = hustle.difficulty.toLowerCase();
+        
+        const card = document.createElement("div");
+        card.className = "hustle-card";
+        card.setAttribute("data-difficulty", normalizedDifficulty);
+        
+        // Generate different HTML for saved page (with delete button)
+        if (isOnSavedPage) {
+            card.innerHTML = createSavedCardHTML(hustle, allHustles);
+        } else {
+            card.innerHTML = createCardHTML(hustle, allHustles);
+        }
+        
+        container.appendChild(card);
+    });
+}
+
+// Function to create saved card HTML with delete button
+function createSavedCardHTML(hustle, hustlesArray) {
+    const hustleIndex = hustlesArray.indexOf(hustle);
+    
+    // Classify hustle for tags
+    const physicalDigital = classifyPhysicalDigital(hustle);
+    const businessCustomer = classifyBusinessCustomer(hustle);
+    
+    return `
+        <div class="copy-button-container">
+            <button class="copy-hustle-btn" data-hustle-index="${hustleIndex}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy
+            </button>
+            <button class="share-hustle-btn" data-hustle-index="${hustleIndex}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+                Share
+            </button>
+            <button class="delete-hustle-btn" data-hustle-index="${hustleIndex}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+                Delete
+            </button>
+        </div>
+        <h3>${hustle.name.replace(/['"*\n]/g, " ").trim()}</h3>
+        <div class="hustle-tags">
+            <span class="hustle-diversity-tag tag-${physicalDigital}">${physicalDigital}</span>
+            <span class="hustle-diversity-tag tag-${businessCustomer}">${businessCustomer.toUpperCase()}</span>
+        </div>
+        <div class="hustle-details">
+            <p><strong>Executive Summary:</strong> ${hustle.summary}</p>
+            
+            <div class="hustle-metrics">
+                <span class="metric"><strong>Difficulty:</strong> ${hustle.difficulty}</span>
+                <span class="metric"><strong>Profitability:</strong> <span class="profit-badge">${hustle.profitability}</span></span>
+                <span class="metric"><strong>Initial Cost:</strong> ${hustle.cost}</span>
+            </div>
+            
+            <div class="metrics-section">
+                <h4>Key Metrics</h4>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <strong>Startup Time:</strong><br>${hustle.metrics.startupTime}
+                    </div>
+                    <div class="metric-item">
+                        <strong>Break-even:</strong><br>${hustle.metrics.breakEven}
+                    </div>
+                    <div class="metric-item">
+                        <strong>Scalability:</strong><br>${hustle.metrics.scalability}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-plan-section">
+                <h4>Action Plan (First Month)</h4>
+                <div class="timeline">
+                    ${hustle.actionPlan.map(((plan, planIndex) => `
+                        <div class="timeline-item">
+                            <div class="timeline-marker">S${planIndex + 1}</div>
+                            <div class="timeline-content">${plan}</div>
+                        </div>
+                    `)).join("")}
+                </div>
+            </div>
+            
+            <div class="resources-section">
+                <h4>Resources</h4>
+                <div class="resources-grid">
+                    <div class="resource-item">
+                        <strong>🛠️ Tools:</strong>
+                        <ul>${hustle.resources.tools.map((tool => `<li>${tool}</li>`)).join("")}</ul>
+                    </div>
+                    <div class="resource-item">
+                        <strong>💻 Platforms:</strong>
+                        <ul>${hustle.resources.platforms.map((platform => `<li>${platform}</li>`)).join("")}</ul>
+                    </div>
+                    <div class="resource-item">
+                        <strong>👥 Communities:</strong>
+                        <ul>${hustle.resources.communities.map((community => `<li>${community}</li>`)).join("")}</ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="monetization-section">
+                <h4>Monetization Streams</h4>
+                <div class="monetization-list">
+                    ${hustle.monetization.map(((stream, streamIndex) => `
+                        <div class="monetization-item">
+                            <span class="monetization-number">${streamIndex + 1}</span>
+                            <span class="monetization-content">${stream}</span>
+                        </div>
+                    `)).join("")}
+                </div>
+            </div>
+            
+            <div class="risks-section">
+                <h4>Risk Analysis</h4>
+                ${hustle.risks.map((risk => `
+                    <div class="risk-item">
+                        <div class="risk-challenge">
+                            <strong>⚠️ Challenge:</strong> ${risk.challenge}
+                        </div>
+                        ${risk.impact ? `<div class="risk-impact"><strong>📊 Impact:</strong> ${risk.impact}</div>` : ''}
+                        <div class="risk-solution">
+                            <strong>💡 Solution:</strong> ${risk.solution}
+                        </div>
+                        ${risk.expected ? `<div class="risk-expected"><strong>📈 Expected:</strong> ${risk.expected}</div>` : ''}
+                    </div>
+                `)).join("")}
+            </div>
+        </div>
+    `;
+}
+
+// Function to simulate progress bar updates
+function updateProgressBar() {
+    const progressFill = document.querySelector('.progress-fill');
+    if (!progressFill) return;
+    
+    // Reset the progress bar to 0%
+    progressFill.style.width = '0%';
+    
+    // For mobile, use a smoother animation with smaller increments
+    const isMobile = window.innerWidth <= 768;
+    const incrementSize = isMobile ? 10 : 20;
+    const intervalTime = isMobile ? 700 : 1000;
+    
+    // Start with lower progress on mobile for a more gradual feeling
+    let progress = isMobile ? 5 : 0;
+    
+    const interval = setInterval(() => {
+        progress += incrementSize;
+        
+        if (progress > 100) {
+            progress = 100;
+            clearInterval(interval);
+        }
+        
+        progressFill.style.width = `${progress}%`;
+        
+        // Add pulsing effect for mobile after 50% progress
+        if (isMobile && progress >= 50 && !progressFill.classList.contains('pulsing')) {
+            progressFill.style.animation = 'pulse-animation 1.5s infinite';
+        }
+        
+        // Clear interval after reaching 100%
+        if (progress >= 100) {
+            clearInterval(interval);
+            window.progressInterval = null;
+        }
+    }, intervalTime);
+    
+    // Store the interval ID so it can be cleared if needed
+    window.progressInterval = interval;
+}
+
+// Function to repair incomplete risk solutions by adding missing details
+async function repairIncompleteRisks(incompleteSolution, city) {
+  // Only attempt to repair if the solution seems incomplete
+  if (!incompleteSolution || incompleteSolution.includes(" → Expected:")) {
+    return null;
+  }
+  
+  try {
+    // Create a prompt to fix the incomplete solution
+    const prompt = `
+    The following risk solution for a side hustle in ${city} is incomplete:
+    "${incompleteSolution.trim()}"
+    
+    Please provide ONLY the missing part to complete this solution with the format:
+    " → Expected: [% improvement]"
+    
+    For example:
+    " → Expected: 85% reduction in customer acquisition cost"
+    
+    Keep it concise, specific, and directly related to the solution provided.
+    `;
+    
+    const response = await fetch(`${GEMINI_CONFIG.API_URL}?key=${GEMINI_CONFIG.API_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        safetySettings: [{ category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" }],
+        generationConfig: {
+          maxOutputTokens: 100,
+          temperature: 0.3
+        }
+      })
+    });
+    
+    if (!response.ok) return null;
+    
+    const result = await response.json();
+    const fixedText = result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    
+    // Extract just the expected outcome part
+    const expectedMatch = fixedText.match(/→\s*Expected:\s*[^"]+/);
+    return expectedMatch ? expectedMatch[0] : null;
+  } catch (error) {
+    console.error("Error repairing risk solution:", error);
+    return null;
+  }
+}
+
+// Function to set up event listeners for hustle cards
+function setupHustleCardListeners(hustles) {
+    if (!hustles || !Array.isArray(hustles)) {
+        console.error("Cannot setup hustle card listeners: hustles is undefined or not an array");
+        return;
+    }
+
+    // Set up copy button event listeners
+    document.querySelectorAll(".copy-hustle-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const index = parseInt(this.getAttribute("data-hustle-index"));
+            const hustle = hustles[index];
+            if (hustle) {
+                const copyText = formatHustleForCopy(hustle);
+                navigator.clipboard.writeText(copyText).then(() => {
+                    const originalHTML = this.innerHTML;
+                    this.classList.add("copied");
+                    this.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Copied!
+                    `;
+                    setTimeout(() => {
+                        this.innerHTML = originalHTML;
+                        this.classList.remove("copied");
+                    }, 2000);
+                }).catch(error => {
+                    console.error("Failed to copy text: ", error);
+                });
+            }
+        });
+    });
+    
+    // Set up save button event listeners
+    document.querySelectorAll(".save-hustle-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const index = parseInt(this.getAttribute("data-hustle-index"));
+            const hustle = hustles[index];
+            
+            if (hustle) {
+                // Get current saved hustles
+                const savedHustles = localStorage.getItem("savedHustles") ? 
+                    JSON.parse(localStorage.getItem("savedHustles")) : [];
+                
+                // Check if this hustle is already saved
+                const isAlreadySaved = savedHustles.some(saved => saved.name === hustle.name);
+                
+                if (isAlreadySaved) {
+                    // If already saved, remove it
+                    const updatedHustles = savedHustles.filter(saved => saved.name !== hustle.name);
+                    localStorage.setItem("savedHustles", JSON.stringify(updatedHustles));
+                    
+                    // Update button UI
+                    this.classList.remove("saved");
+                    this.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Save
+                    `;
+                } else {
+                    // If not saved yet, add it
+                    savedHustles.push(hustle);
+                    localStorage.setItem("savedHustles", JSON.stringify(savedHustles));
+                    
+                    // Update button UI
+                    this.classList.add("saved");
+                    this.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Saved
+                    `;
+                }
+            }
+        });
+    });
+    
+    // Set up share button event listeners
+    document.querySelectorAll('.share-hustle-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-hustle-index'));
+            const hustle = hustles[index];
+            
+            if (hustle) {
+                // Create shareable content
+                const title = `Check out this hustle idea: ${hustle.name}`;
+                const text = `${hustle.summary}\n\nProfitability: ${hustle.profitability}\nDifficulty: ${hustle.difficulty}`;
+                const hustleTitle = hustle.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+                const shareUrl = `https://wehustle.it.com/?hustle=${encodeURIComponent(hustleTitle)}`;
+                
+                // Use Web Share API if available
+                if (navigator.share) {
+                    navigator.share({
+                        title: title,
+                        text: text,
+                        url: shareUrl
+                    })
+                    .then(() => {
+                        console.log('Shared successfully');
+                    })
+                    .catch(err => {
+                        console.error('Share failed:', err);
+                        // Fall back to clipboard if share fails
+                        fallbackToClipboard();
+                    });
+                } else {
+                    // Fallback for browsers without Web Share API
+                    fallbackToClipboard();
+                }
+                
+                // Fallback function to copy to clipboard
+                function fallbackToClipboard() {
+                    const shareText = `${title}\n\n${text}\n\n${shareUrl}`;
+                    navigator.clipboard.writeText(shareText)
+                        .then(() => {
+                            alert("Link copied to clipboard!");
+                            
+                            // Success feedback on button
+                            const originalHTML = button.innerHTML;
+                            button.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                Copied!
+                            `;
+                            setTimeout(() => {
+                                button.innerHTML = originalHTML;
+                            }, 2000);
+                        })
+                        .catch(err => {
+                            console.error('Could not copy link: ', err);
+                            alert('Error copying link to clipboard');
+                        });
+                }
+            }
+        });
+    });
+}
+
+// Function to format hustle data for copying
+function formatHustleForCopy(hustle) {
+    if (!hustle) return "";
+    
+    return `
+${hustle.name}
+
+${hustle.summary}
+
+Difficulty: ${hustle.difficulty}
+Profitability: ${hustle.profitability}
+Cost: ${hustle.cost}
+
+Key Metrics:
+- Startup Time: ${hustle.metrics.startupTime}
+- Break-even Point: ${hustle.metrics.breakEven}
+- Scalability: ${hustle.metrics.scalability}
+
+Action Plan (First Month):
+${hustle.actionPlan.map((plan, i) => `Week ${i+1}: ${plan}`).join('\n')}
+
+Resources:
+- Tools: ${hustle.resources.tools.join(', ')}
+- Platforms: ${hustle.resources.platforms.join(', ')}
+- Communities: ${hustle.resources.communities.join(', ')}
+
+Monetization:
+${hustle.monetization.map((stream, i) => `${i+1}. ${stream}`).join('\n')}
+
+Risk Analysis:
+${hustle.risks.map(risk => `- Challenge: ${risk.challenge}
+  Impact: ${risk.impact || 'N/A'}
+  Solution: ${risk.solution}
+  Expected: ${risk.expected || 'N/A'}`).join('\n')}
+`;
+}
+
+// Function to create standard card HTML
+function createCardHTML(hustle, hustlesArray) {
+    const hustleIndex = hustlesArray.indexOf(hustle);
+    
+    // Classify hustle for tags
+    const physicalDigital = classifyPhysicalDigital(hustle);
+    const businessCustomer = classifyBusinessCustomer(hustle);
+    
+    // Check if the hustle is already saved
+    let savedHustles = JSON.parse(localStorage.getItem('savedHustles') || '[]');
+    const isAlreadySaved = savedHustles.some(saved => saved.name === hustle.name);
+    
+    return `
+        <div class="copy-button-container">
+            <button class="copy-hustle-btn" data-hustle-index="${hustleIndex}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy
+            </button>
+            <button class="save-hustle-btn ${isAlreadySaved ? 'saved' : ''}" data-hustle-index="${hustleIndex}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="${isAlreadySaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+                ${isAlreadySaved ? 'Saved' : 'Save'}
+            </button>
+            <button class="share-hustle-btn" data-hustle-index="${hustleIndex}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+                Share
+            </button>
+        </div>
+        <h3>${hustle.name.replace(/['"*\n]/g, " ").trim()}</h3>
+        <div class="hustle-tags">
+            <span class="hustle-diversity-tag tag-${physicalDigital}">${physicalDigital}</span>
+            <span class="hustle-diversity-tag tag-${businessCustomer}">${businessCustomer.toUpperCase()}</span>
+        </div>
+        <div class="hustle-details">
+            <p><strong>Executive Summary:</strong> ${hustle.summary}</p>
+            
+            <div class="hustle-metrics">
+                <span class="metric"><strong>Difficulty:</strong> ${hustle.difficulty}</span>
+                <span class="metric"><strong>Profitability:</strong> <span class="profit-badge">${hustle.profitability}</span></span>
+                <span class="metric"><strong>Initial Cost:</strong> ${hustle.cost}</span>
+            </div>
+            
+            <div class="metrics-section">
+                <h4>Key Metrics</h4>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <strong>Startup Time:</strong><br>${hustle.metrics.startupTime}
+                    </div>
+                    <div class="metric-item">
+                        <strong>Break-even:</strong><br>${hustle.metrics.breakEven}
+                    </div>
+                    <div class="metric-item">
+                        <strong>Scalability:</strong><br>${hustle.metrics.scalability}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-plan-section">
+                <h4>Action Plan (First Month)</h4>
+                <div class="timeline">
+                    ${hustle.actionPlan.map(((plan, planIndex) => `
+                        <div class="timeline-item">
+                            <div class="timeline-marker">S${planIndex + 1}</div>
+                            <div class="timeline-content">${plan}</div>
+                        </div>
+                    `)).join("")}
+                </div>
+            </div>
+            
+            <div class="resources-section">
+                <h4>Resources</h4>
+                <div class="resources-grid">
+                    <div class="resource-item">
+                        <strong>🛠️ Tools:</strong>
+                        <ul>${hustle.resources.tools.map((tool => `<li>${tool}</li>`)).join("")}</ul>
+                    </div>
+                    <div class="resource-item">
+                        <strong>💻 Platforms:</strong>
+                        <ul>${hustle.resources.platforms.map((platform => `<li>${platform}</li>`)).join("")}</ul>
+                    </div>
+                    <div class="resource-item">
+                        <strong>👥 Communities:</strong>
+                        <ul>${hustle.resources.communities.map((community => `<li>${community}</li>`)).join("")}</ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="monetization-section">
+                <h4>Monetization Streams</h4>
+                <div class="monetization-list">
+                    ${hustle.monetization.map(((stream, streamIndex) => `
+                        <div class="monetization-item">
+                            <span class="monetization-number">${streamIndex + 1}</span>
+                            <span class="monetization-content">${stream}</span>
+                        </div>
+                    `)).join("")}
+                </div>
+            </div>
+            
+            <div class="risks-section">
+                <h4>Risk Analysis</h4>
+                ${hustle.risks.map((risk => `
+                    <div class="risk-item">
+                        <div class="risk-challenge">
+                            <strong>⚠️ Challenge:</strong> ${risk.challenge}
+                        </div>
+                        ${risk.impact ? `<div class="risk-impact"><strong>📊 Impact:</strong> ${risk.impact}</div>` : ''}
+                        <div class="risk-solution">
+                            <strong>💡 Solution:</strong> ${risk.solution}
+                        </div>
+                        ${risk.expected ? `<div class="risk-expected"><strong>📈 Expected:</strong> ${risk.expected}</div>` : ''}
+                    </div>
+                `)).join("")}
+            </div>
+        </div>
+    `;
+}
+
+// Update the function that shows loading state in hustle output
+function showHustleLoading(city) {
+    const hustleOutput = document.getElementById('hustle-output');
+    hustleOutput.style.display = 'block';
+    hustleOutput.innerHTML = `
+        <div class="loading" aria-live="polite">
+            <div>
+                Scanning <span class="scanning-text">hustle opportunities</span> in 
+                <span id="loading-city">${city}</span><span class="scanning-dots"></span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+        <p class="loading-subtext">Analyzing local markets and demographics...</p>
+    `;
+    
+    // Start progress bar animation
+    setTimeout(() => {
+        const progressFill = document.querySelector('.progress-fill');
+        if (progressFill) {
+            progressFill.style.width = '30%';
+        }
+    }, 500);
+    
+    setTimeout(() => {
+        const progressFill = document.querySelector('.progress-fill');
+        if (progressFill) {
+            progressFill.style.width = '70%';
+        }
+    }, 1500);
+}
+
+// After the DOMContentLoaded event listener section, add a function to handle mobile menu scrolling
+
+// Store scroll position when menu opens
+let scrollPosition = 0;
+
+// Enhance mobile menu functionality to properly handle scrolling
+function setupMobileMenu() {
+    const menuToggle = document.getElementById('mobile-menu');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (!menuToggle || !navLinks) return;
+    
+    menuToggle.addEventListener('click', function() {
+        // Toggle active classes
+        this.classList.toggle('is-active');
+        navLinks.classList.toggle('active');
+        
+        // Handle body class and scroll position
+        if (!document.body.classList.contains('menu-open')) {
+            // Menu is opening
+            scrollPosition = window.pageYOffset;
+            document.body.classList.add('menu-open');
+            document.body.style.top = `-${scrollPosition}px`;
+        } else {
+            // Menu is closing
+            document.body.classList.remove('menu-open');
+            document.body.style.top = '';
+            window.scrollTo(0, scrollPosition);
+        }
+    });
+    
+    // Close menu when clicking a link
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            navLinks.classList.remove('active');
+            menuToggle.classList.remove('is-active');
+            
+            // Restore scroll position
+            document.body.classList.remove('menu-open');
+            document.body.style.top = '';
+            window.scrollTo(0, scrollPosition);
+        });
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (navLinks.classList.contains('active') && 
+            !navLinks.contains(event.target) && 
+            !menuToggle.contains(event.target)) {
+            navLinks.classList.remove('active');
+            menuToggle.classList.remove('is-active');
+            
+            // Restore scroll position
+            document.body.classList.remove('menu-open');
+            document.body.style.top = '';
+            window.scrollTo(0, scrollPosition);
+        }
+    });
+}
+
+// Call the function when the document is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    setupMobileMenu();
+    // ... other existing code ...
+});
