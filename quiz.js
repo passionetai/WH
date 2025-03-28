@@ -3,11 +3,8 @@
 // Show debug status in UI for troubleshooting
 const DEBUG = false;
 
-// Gemini API Configuration
-const GEMINI_CONFIG = {
-    API_URL: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
-    API_KEY: "AIzaSyAd27ptuNgUsenf_vw2eQodBmm9kE-D8cE"
-};
+// Gemini API Configuration is now imported from script.js
+// The GEMINI_CONFIG declaration has been removed to avoid duplication
 
 // Store previously generated hustles for uniqueness
 const PREVIOUS_HUSTLES = JSON.parse(localStorage.getItem('previousHustles')) || [];

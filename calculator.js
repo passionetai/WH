@@ -1,11 +1,5 @@
 // calculator.js - Hustle Calculator Functionality with Gemini API Integration
 
-// Gemini API Configuration
-const GEMINI_CONFIG = {
-    API_URL: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
-    API_KEY: "AIzaSyAd27ptuNgUsenf_vw2eQodBmm9kE-D8cE" // Same key as in script.js
-};
-
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize particles
     if (typeof particlesJS !== 'undefined') {
@@ -503,4 +497,4 @@ function initParticles() {
         },
         "retina_detect": true
     });
-} 
+}
