@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Find your perfect side hustle with WeHustle It - Discover local business opportunities and start earning today">
+    <meta name="keywords" content="side hustle, local business, entrepreneurship, WeHustle It, business opportunities, make money, start business">
+    <meta name="author" content="WeHustle It">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="WeHustle It - Find Your Local Paying Hustle">
+    <meta property="og:description" content="Discover profitable side hustles in your city. Start earning with WeHustle It's personalized business recommendations.">
+    <meta property="og:type" content="website">
+    <title>WeHustle It - Find Your Local Paying Hustle</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito&family=Quicksand:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Particles.js CDN -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+    <a href="#main-content" class="skip-link" tabindex="0">Skip to main content</a>
+<nav class="navbar">
+        <div class="nav-logo">
+            <img src="images/logo.png" alt="WeHustle It company logo" class="nav-logo-img">
+            <span class="logo-text" aria-label="WeHustle It company name">WeHustle It</span>
+        </div>
+        <ul class="nav-links" role="navigation" aria-label="Main navigation">
+            <li><a href="index.html" aria-current="page" tabindex="0">Home</a></li>
+            <li><a href="quiz.html" tabindex="0">Hustle Quiz</a></li>
+            <li><a href="calculator.html" tabindex="0">Hustle Calculator</a></li>
+  </ul>
+</nav>
+    <div id="particles-js" aria-hidden="true"></div>
+    <div id="main-content" role="main">
+        <header>
+            <div class="logo-title">
+                <img src="images/logo.png" alt="WeHustle It company logo" class="header-logo">
+                <h1>WeHustle It</h1>
+            </div>
+            <h2 class="subtitle">Find Your Local Paying Hustle!</h2>
+            <nav class="main-nav">
+                <a href="saved.html" class="saved-hustles-link" aria-label="View your saved hustles" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Saved Hustles
+                </a>
+            </nav>
+        </header>
+
+        <div class="how-to-guide">
+            <div class="guide-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="10" r="3"></circle>
+                            <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"></path>
+                        </svg>
+                        Choose Your City
+                    </h4>
+                    <p>Enter your city in the search box below or select from our popular cities</p>
+                </div>
+            </div>
+            
+            <div class="guide-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 22v-8h4v8M2 22h20M4 8V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2M3 8h18a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/>
+                        </svg>
+                        Get Local Hustles
+                    </h4>
+                    <p>We'll analyze your local market and generate unique business opportunities tailored to your city</p>
+                </div>
+            </div>
+            
+            <div class="guide-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                        </svg>
+                        Explore & Customize
+                    </h4>
+                    <p>Save your favorite hustles, get more diverse options, or refresh for new ideas anytime</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="search-container" role="search">
+            <input type="text" id="city-input" placeholder="Enter your city" aria-label="Enter your city name" tabindex="0">
+            <button id="get-hustle-btn" aria-label="Search for hustles in your city" tabindex="0">FIND MY HUSTLE</button>
+        </div>
+        
+        <h3 class="cities-title">Popular cities</h3>
+        
+        <div class="city-buttons-container" role="group" aria-label="Popular cities list">
+            <button class="city-btn" data-city="New York" aria-label="Search hustles in New York" tabindex="0">New York</button>
+            <button class="city-btn" data-city="London" aria-label="Search hustles in London" tabindex="0">London</button>
+            <button class="city-btn" data-city="Tokyo" aria-label="Search hustles in Tokyo" tabindex="0">Tokyo</button>
+            <button class="city-btn" data-city="Paris" aria-label="Search hustles in Paris" tabindex="0">Paris</button>
+            <button class="city-btn" data-city="Sydney" aria-label="Search hustles in Sydney" tabindex="0">Sydney</button>
+            <button class="city-btn" data-city="Los Angeles" aria-label="Search hustles in Los Angeles" tabindex="0">Los Angeles</button>
+            <button class="city-btn" data-city="Dubai" aria-label="Search hustles in Dubai" tabindex="0">Dubai</button>
+            <button class="city-btn" data-city="Singapore" aria-label="Search hustles in Singapore" tabindex="0">Singapore</button>
+            <button class="city-btn" data-city="Hong Kong" aria-label="Search hustles in Hong Kong" tabindex="0">Hong Kong</button>
+            <button class="city-btn" data-city="Toronto" aria-label="Search hustles in Toronto" tabindex="0">Toronto</button>
+            <button class="city-btn" data-city="Mumbai" aria-label="Search hustles in Mumbai" tabindex="0">Mumbai</button>
+            <button class="city-btn" data-city="Seoul" aria-label="Search hustles in Seoul" tabindex="0">Seoul</button>
+            <button class="city-btn" data-city="São Paulo" aria-label="Search hustles in São Paulo" tabindex="0">São Paulo</button>
+            <button class="city-btn" data-city="Berlin" aria-label="Search hustles in Berlin" tabindex="0">Berlin</button>
+            <button class="city-btn" data-city="Cape Town" aria-label="Search hustles in Cape Town" tabindex="0">Cape Town</button>
+            <button class="city-btn" data-city="Cairo" aria-label="Search hustles in Cairo" tabindex="0">Cairo</button>
+            <button class="city-btn" data-city="Nairobi" aria-label="Search hustles in Nairobi" tabindex="0">Nairobi</button>
+            <button class="city-btn" data-city="Amsterdam" aria-label="Search hustles in Amsterdam" tabindex="0">Amsterdam</button>
+            <button class="city-btn" data-city="Barcelona" aria-label="Search hustles in Barcelona" tabindex="0">Barcelona</button>
+            <button class="city-btn" data-city="Vancouver" aria-label="Search hustles in Vancouver" tabindex="0">Vancouver</button>
+            <button class="city-btn" data-city="Melbourne" aria-label="Search hustles in Melbourne" tabindex="0">Melbourne</button>
+            <button class="city-btn" data-city="Lagos" aria-label="Search hustles in Lagos" tabindex="0">Lagos</button>
+            <button class="city-btn" data-city="Rome" aria-label="Search hustles in Rome" tabindex="0">Rome</button>
+            <button class="city-btn" data-city="Madrid" aria-label="Search hustles in Madrid" tabindex="0">Madrid</button>
+            <button class="city-btn" data-city="Vienna" aria-label="Search hustles in Vienna" tabindex="0">Vienna</button>
+            <button class="city-btn" data-city="Bangkok" aria-label="Search hustles in Bangkok" tabindex="0">Bangkok</button>
+            <button class="city-btn" data-city="Shanghai" aria-label="Search hustles in Shanghai" tabindex="0">Shanghai</button>
+            <button class="city-btn" data-city="Istanbul" aria-label="Search hustles in Istanbul" tabindex="0">Istanbul</button>
+        </div>
+    </div>
+
+    <div id="hustle-output" role="region" aria-label="Hustle search results">
+        <div class="hustle-cards-container">
+            <!-- Cards will be dynamically added here -->
+        </div>
+        <div id="loading-state" role="alert" aria-live="polite" hidden>
+            <div class="loading-spinner"></div>
+            <p>Loading hustle opportunities...</p>
+        </div>
+        <div id="error-state" role="alert" aria-live="assertive" hidden>
+            <p>An error occurred while loading results. Please try again.</p>
+            <button onclick="retrySearch()" class="retry-button" aria-label="Retry search">Retry</button>
+        </div>
+        <div id="no-results" role="alert" aria-live="polite" hidden>
+            <p>No hustle opportunities found for this search. Try a different city.</p>
+        </div>
+        <div class="refresh-button-container">
+            <button class="refresh-btn" id="refresh-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/>
+                </svg>
+                Refresh Ideas
+            </button>
+            <button class="refresh-btn" id="more-diverse-btn" style="margin-left: 10px; background: linear-gradient(135deg, var(--accent-color) 0%, var(--secondary-color) 100%);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                </svg>
+                Get More Diverse Hustle
+            </button>
+        </div>
+    </div>
+
+    <footer role="contentinfo">
+        WeHustle It - Hustling Worldwide
+    </footer>
+
+    <!-- Updated Scroll to Top Button -->
+    <button class="scroll-top-btn" aria-label="Scroll back to top" tabindex="0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 4l-8 8h6v8h4v-8h6z"/>
+        </svg>
+    </button>
+
+    <!-- JavaScript Files -->
+    <script src="script.js"></script>
+</body>
+</html>

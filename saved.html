@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Access your saved side hustle ideas and business opportunities. Manage and track your favorite business ventures with WeHustle It.">
+    <meta name="keywords" content="saved hustles, business ideas, side hustle management, WeHustle It, business tracking">
+    <meta name="author" content="WeHustle It">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="WeHustle It - Saved Hustles">
+    <meta property="og:description" content="Access and manage your saved business opportunities. Keep track of your favorite side hustle ideas with WeHustle It.">
+    <meta property="og:type" content="website">
+    <title>WeHustle It - Your Saved Hustles</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito&family=Quicksand:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Particles.js CDN -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-logo">
+    <img src="images/logo.png" alt="WeHustle It company logo" class="nav-logo-img">
+    <span class="logo-text" aria-label="WeHustle It company name">WeHustle It</span>
+  </div>
+  <ul class="nav-links" role="navigation" aria-label="Main navigation">
+    <li><a href="index.html" tabindex="0">Home</a></li>
+    <li><a href="quiz.html" tabindex="0">Hustle Quiz</a></li>
+    <li><a href="calculator.html" tabindex="0">Hustle Calculator</a></li>
+  </ul>
+</nav>
+    <div id="particles-js" aria-hidden="true"></div>
+    <div id="main-content" role="main">
+        <header>
+            <h1>Saved Hustles</h1>
+            <nav class="main-nav">
+                <a href="index.html" class="saved-hustles-link" aria-label="Return to home page">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                    </svg>
+                    Back to Home
+                </a>
+            </nav>
+        </header>
+
+        <div id="saved-hustles-output" role="region" aria-label="Your saved hustles">
+            <!-- Saved hustle cards will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <footer role="contentinfo">
+        WeHustle It - Hustling Worldwide
+    </footer>
+
+    <!-- Updated Scroll to Top Button -->
+    <button class="scroll-top-btn" aria-label="Scroll back to top" tabindex="0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 4l-8 8h6v8h4v-8h6z"/>
+        </svg>
+    </button>
+
+    <script src="saved.js"></script>
+</body>
+</html> 

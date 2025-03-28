@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Take our Hustle Quiz to find the perfect side business that matches your skills and interests. Get personalized recommendations for your next venture.">
+    <meta name="keywords" content="hustle quiz, business quiz, entrepreneurship test, side hustle finder, WeHustle It, career quiz">
+    <meta name="author" content="WeHustle It">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="WeHustle It - Hustle Quiz">
+    <meta property="og:description" content="Discover your ideal side hustle with our personalized quiz. Get tailored business recommendations based on your skills and interests.">
+    <meta property="og:type" content="website">
+    <title>WeHustle It - Find Your Perfect Hustle Match</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito&family=Quicksand:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Particles.js CDN -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-logo">
+    <img src="images/logo.png" alt="WeHustle It company logo" class="nav-logo-img">
+    <span class="logo-text" aria-label="WeHustle It company name">WeHustle It</span>
+  </div>
+  <ul class="nav-links" role="navigation" aria-label="Main navigation">
+    <li><a href="index.html" tabindex="0">Home</a></li>
+    <li><a href="quiz.html" aria-current="page" tabindex="0">Hustle Quiz</a></li>
+    <li><a href="calculator.html" tabindex="0">Hustle Calculator</a></li>
+  </ul>
+</nav>
+    <div id="particles-js" aria-hidden="true"></div>
+    <div id="main-content" role="main">
+        <!-- Header -->
+        <header class="quiz-header">
+            <h1>Find Your Perfect Hustle!</h1>
+            <p>Answer a few quick questions to discover the best side hustle that matches your preferences and availability.</p>
+        </header>
+    </div>
+
+    <!-- Quiz Container -->
+    <div class="quiz-container" role="form" aria-label="Hustle matching quiz">
+        <form id="hustle-quiz">
+            <!-- Question 1 -->
+            <div class="quiz-step" id="step1" role="group" aria-labelledby="q1-title">
+                <h3 id="q1-title">Question 1: Where do you prefer to work?</h3>
+                <div class="radio-group" role="radiogroup" aria-labelledby="q1-title">
+                    <label class="radio-option" tabindex="0">
+                        <input type="radio" name="q1" value="outdoors" required aria-describedby="outdoors-desc">
+                        <span class="radio-label">Outdoors</span>
+                        <span class="radio-description" id="outdoors-desc">I enjoy being outside and active</span>
+                    </label>
+                    <label class="radio-option" tabindex="0">
+                        <input type="radio" name="q1" value="indoors" required aria-describedby="indoors-desc">
+                        <span class="radio-label">Indoors</span>
+                        <span class="radio-description" id="indoors-desc">I prefer working from home or office spaces</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="quiz-step" id="step2" role="group" aria-labelledby="q2-title">
+                <h3 id="q2-title">Question 2: How many hours can you commit weekly?</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="q2" value="less10" required aria-describedby="less10-desc">
+                        <span class="radio-label">Less than 10 hours</span>
+                        <span class="radio-description" id="less10-desc">I'm looking for something very part-time</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="q2" value="10-20" required aria-describedby="10-20-desc">
+                        <span class="radio-label">10-20 hours</span>
+                        <span class="radio-description" id="10-20-desc">I can dedicate a moderate amount of time</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="q2" value="more20" required aria-describedby="more20-desc">
+                        <span class="radio-label">More than 20 hours</span>
+                        <span class="radio-description" id="more20-desc">I'm ready to commit significant time to my side hustle</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="quiz-step" id="step3" role="group" aria-labelledby="q3-title">
+                <h3 id="q3-title">Question 3: What's your skill level?</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="q3" value="beginner" required aria-describedby="beginner-desc">
+                        <span class="radio-label">Beginner</span>
+                        <span class="radio-description" id="beginner-desc">I'm new to this</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="q3" value="intermediate" required aria-describedby="intermediate-desc">
+                        <span class="radio-label">Intermediate</span>
+                        <span class="radio-description" id="intermediate-desc">I have some experience</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="q3" value="advanced" required aria-describedby="advanced-desc">
+                        <span class="radio-label">Advanced</span>
+                        <span class="radio-description" id="advanced-desc">I'm skilled</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="quiz-step" id="step4" role="group" aria-labelledby="q4-title">
+                <h3 id="q4-title">Question 4: What are you most interested in?</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="q4" value="creative" required aria-describedby="creative-desc">
+                        <span class="radio-label">Creative work</span>
+                        <span class="radio-description" id="creative-desc">e.g., art, design</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="q4" value="technical" required aria-describedby="technical-desc">
+                        <span class="radio-label">Technical work</span>
+                        <span class="radio-description" id="technical-desc">e.g., tech, data</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="q4" value="social" required aria-describedby="social-desc">
+                        <span class="radio-label">Social work</span>
+                        <span class="radio-description" id="social-desc">e.g., events, teaching</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="quiz-step" id="step5" role="group" aria-labelledby="q5-title">
+                <h3 id="q5-title">Question 5: What's your startup budget?</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="q5" value="low" required aria-describedby="low-desc">
+                        <span class="radio-label">Low</span>
+                        <span class="radio-description" id="low-desc">Under $100</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="q5" value="medium" required aria-describedby="medium-desc">
+                        <span class="radio-label">Medium</span>
+                        <span class="radio-description" id="medium-desc">$100-$500</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="q5" value="high" required aria-describedby="high-desc">
+                        <span class="radio-label">High</span>
+                        <span class="radio-description" id="high-desc">Over $500</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Results Loading State -->
+            <div id="quiz-loading" role="alert" aria-live="polite" hidden>
+                <div class="loading-spinner"></div>
+                <p>Analyzing your responses...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="quiz-error" role="alert" aria-live="assertive" hidden>
+                <p>An error occurred while processing your results. Please try again.</p>
+                <button type="button" class="retry-button" onclick="retryQuiz()" aria-label="Retry quiz">Retry</button>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-action">
+                <button type="submit" class="cta-button" aria-label="Submit quiz and see results" tabindex="0">See Your Results</button>
+            </div>
+        </form>
+    </div>
+
+    <footer role="contentinfo">
+        WeHustle It - Hustling Worldwide
+    </footer>
+
+    <!-- Updated Scroll to Top Button -->
+    <button class="scroll-top-btn" aria-label="Scroll back to top" tabindex="0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 4l-8 8h6v8h4v-8h6z"/>
+        </svg>
+    </button>
+
+    <!-- Add a status display for debugging -->
+    <div id="debug-status" style="position: fixed; bottom: 80px; right: 20px; background: rgba(0,0,0,0.7); color: white; padding: 10px; border-radius: 5px; font-size: 12px; max-width: 300px; display: none;">
+        <strong>Quiz Status:</strong> <span id="status-message">Waiting for input</span>
+    </div>
+
+    <!-- Load quiz.js before script.js -->
+    <script src="quiz.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 

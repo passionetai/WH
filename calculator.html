@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate your potential earnings and ROI with our Hustle Calculator. Plan your side business with accurate financial projections.">
+    <meta name="keywords" content="hustle calculator, business ROI calculator, side hustle earnings, profit calculator, WeHustle It, business planning">
+    <meta name="author" content="WeHustle It">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="WeHustle It - Hustle Calculator">
+    <meta property="og:description" content="Plan your side hustle success with our earnings calculator. Get accurate financial projections and ROI estimates for your business idea.">
+    <meta property="og:type" content="website">
+    <title>WeHustle It - Calculate Your Hustle Earnings</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito&family=Quicksand:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Particles.js CDN -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+    <!-- Sticky Navbar -->
+    <nav class="navbar">
+        <div class="nav-logo">
+            <img src="images/logo.png" alt="WeHustle It company logo" class="nav-logo-img">
+            <span class="logo-text" aria-label="WeHustle It company name">WeHustle It</span>
+        </div>
+        <ul class="nav-links" role="navigation" aria-label="Main navigation">
+            <li><a href="index.html" tabindex="0">Home</a></li>
+            <li><a href="quiz.html" tabindex="0">Hustle Quiz</a></li>
+            <li><a href="calculator.html" aria-current="page" tabindex="0">Hustle Calculator</a></li>
+        </ul>
+    </nav>
+
+    <div id="particles-js" aria-hidden="true"></div>
+    <div id="main-content" role="main">
+        <!-- Header -->
+        <header class="quiz-header">
+            <h1>Hustle Calculator</h1>
+            <p>Calculate your potential earnings and break-even time.</p>
+        </header>
+
+        <!-- Calculator Container -->
+        <div class="calculator-container" role="form" aria-label="Earnings calculator">
+            <form id="calculator-form">
+                <div class="input-group">
+                    <label for="initial-investment" tabindex="0">Initial Investment ($)</label>
+                    <input type="number" id="initial-investment" min="0" step="1" required 
+                           aria-label="Enter initial investment amount in dollars" 
+                           aria-describedby="investment-error"
+                           tabindex="0">
+                    <div id="investment-error" class="error-message" role="alert" hidden></div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="hours-per-week" tabindex="0">Hours per Week</label>
+                    <input type="number" id="hours-per-week" min="1" max="168" step="1" required 
+                           aria-label="Enter number of hours per week" 
+                           aria-describedby="hours-error"
+                           tabindex="0">
+                    <div id="hours-error" class="error-message" role="alert" hidden></div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="hourly-rate" tabindex="0">Expected Hourly Rate ($)</label>
+                    <input type="number" id="hourly-rate" min="1" step="0.01" required 
+                           aria-label="Enter expected hourly rate in dollars" 
+                           aria-describedby="rate-error"
+                           tabindex="0">
+                    <div id="rate-error" class="error-message" role="alert" hidden></div>
+                </div>
+                
+                <div class="form-action">
+                    <button type="submit" class="cta-button" aria-label="Calculate earnings" tabindex="0">Calculate</button>
+                </div>
+            </form>
+
+            <!-- Loading State -->
+            <div id="calc-loading" role="alert" aria-live="polite" hidden>
+                <div class="loading-spinner"></div>
+                <p>Calculating your potential earnings...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="calc-error" role="alert" aria-live="assertive" hidden>
+                <p>An error occurred while calculating. Please check your inputs and try again.</p>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="calculator-results" role="region" aria-label="Calculation results" aria-live="polite">
+            <!-- Results will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <footer role="contentinfo">
+        WeHustle It - Hustling Worldwide
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top-btn" aria-label="Scroll back to top" tabindex="0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 4l-8 8h6v8h4v-8h6z"/>
+        </svg>
+    </button>
+
+    <!-- JavaScript to handle calculations -->
+    <script src="calculator.js"></script>
+</body>
+</html> 
