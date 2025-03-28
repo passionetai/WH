@@ -1,9 +1,4 @@
-/* Hide navbar on mobile */
-@media (max-width: 768px) {
-    .navbar {
-        display: none;
-    }
-}/* styles.css - Apple-inspired Update */
+/* styles.css - Apple-inspired Update */
 :root {
     --primary-color: #007AFF;
     --secondary-color: #34C759;
