@@ -87,7 +87,7 @@
   }
   
   .header-logo {
-    width: 75px; /* 1.5x larger than typical logo size */
+    width: 75px;
     height: 75px;
     border-radius: 50%;
     padding: 5px;
@@ -97,10 +97,36 @@
   
   h1 {
     font-family: var(--font-heading);
-    font-size: 3.3rem; /* 1.5x larger than original 2.2rem */
+    font-size: 3.3rem;
     margin-bottom: 0.5rem;
     text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
     font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    header {
+      padding: 1.5rem 1rem;
+      margin: 0.25rem;
+    }
+    
+    .logo-title {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .header-logo {
+      width: 60px;
+      height: 60px;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      line-height: 1.2;
+    }
+    
+    .subtitle {
+      font-size: 1.2rem;
+    }
   }
   
   .subtitle {
