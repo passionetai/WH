@@ -763,6 +763,13 @@ async function generateAlternativeHustle(city, previousHustles, seenModels, seen
   return parsedHustles[0];
 }
 
+document.addEventListener("DOMContentLoaded",(function(){
+    // Clear and hide the hustle output on initial load
+    const hustleOutput = document.getElementById("hustle-output");
+    hustleOutput.innerHTML = "";
+    hustleOutput.style.display = "none";
+    
+    const e=document.getElementById("city-input"),t=document.getElementById("get-hustle-btn"),n=document.querySelectorAll(".city-btn");t.addEventListener("click",(function(){const t=e.value.trim();t?(hustleOutput.style.display = "block", fetchHustleData(t)):(showError("Please enter a city name"),scrollToHustleOutput())})),n.forEach((t=>{t.addEventListener("click",(async function(){const t=this.textContent;n.forEach((e=>{e.disabled=!0,e.style.cursor="not-allowed"})),this.textContent="Loading...",this.classList.add("loading"),n.forEach((e=>e.classList.remove("active"))),this.classList.add("active");const i=this.getAttribute("data-city");e.value=i;try{hustleOutput.style.display = "block", await fetchHustleData(i),document.getElementById("hustle-output").scrollIntoView({behavior:"smooth"})}finally{this.textContent=t,this.classList.remove("loading"),n.forEach((e=>{e.disabled=!1,e.style.cursor = "pointer"}))}}))})),e.addEventListener("keypress",(async function(t){if("Enter"===t.key){const t=e.value.trim();if(t){hustleOutput.style.display = "block"; const e=document.querySelector(`.city-btn[data-city="${t}"]`);if(e){const n=e.textContent;e.textContent="Loading...",e.classList.add("loading"),document.querySelectorAll(".city-btn").forEach((e=>{e.disabled=!0,e.style.cursor="not-allowed"}));try{await fetchHustleData(t),document.querySelectorAll(".city-btn").forEach((e=>e.classList.remove("active"))),e.classList.add("active")}finally{e.textContent=n,e.classList.remove("loading"),document.querySelectorAll(".city-btn").forEach((e=>{e.disabled=!1,e.style.cursor = "pointer"}))}}else await fetchHustleData(t)}else showError("Please enter a city name"),scrollToHustleOutput()}}))}));
 
 // Track current displayed hustles and city globally
 let currentDisplayedHustles = [];
@@ -1930,370 +1937,998 @@ function showHustleLoading(city) {
 // Store scroll position when menu opens
 let scrollPosition = 0;
 
-// Mobile menu setup with improved event handling
+// Enhance mobile menu functionality to properly handle scrolling
 function setupMobileMenu() {
     const menuToggle = document.getElementById('mobile-menu');
     const navLinks = document.querySelector('.nav-links');
-    let scrollPosition = 0;
-
-    if (!menuToggle || !navLinks) return;
-
-    menuToggle.addEventListener('click', function(e) {
-        e.stopPropagation(); // Prevent event bubbling
+    
+    if (!menuToggle || !navLinks) {
+        console.error("Mobile menu elements not found!");
+        return; 
+    }
+    
+    let scrollPosition = 0; // Declare scrollPosition within the function scope
+    
+    menuToggle.addEventListener('click', function() {
+        const isOpening = !navLinks.classList.contains('active');
+        
+        // Toggle active classes
         this.classList.toggle('is-active');
         navLinks.classList.toggle('active');
         
-        // Toggle body scroll
-        if (navLinks.classList.contains('active')) {
-            scrollPosition = window.scrollY;
-            document.body.style.overflow = 'hidden';
+        // Handle body class and scroll position
+        if (isOpening) {
+            // Menu is opening: Store scroll position and apply fixed positioning
+            scrollPosition = window.pageYOffset;
+            document.body.classList.add('menu-open');
+            // Apply the negative top margin AFTER adding the class
+            document.body.style.top = `-${scrollPosition}px`; 
         } else {
-            document.body.style.overflow = '';
+            // Menu is closing: Remove class and restore scroll position
+            document.body.classList.remove('menu-open');
+            document.body.style.top = '';
             window.scrollTo(0, scrollPosition);
         }
     });
-
-    // Close menu when clicking outside
-    document.addEventListener('click', function(e) {
-        if (navLinks.classList.contains('active') && 
-            !navLinks.contains(e.target) && 
-            !menuToggle.contains(e.target)) {
-            navLinks.classList.remove('active');
-            menuToggle.classList.remove('is-active');
-            document.body.style.overflow = '';
-            window.scrollTo(0, scrollPosition);
-        }
-    });
-}
-
-// Call the function when the document is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    setupMobileMenu();
-    // ... other existing code ...
-});
-
-// ---
-// Inspiration Section Logic
-// ---
-
-const inspirationContainer = document.querySelector('.inspiration-cards-container');
-const hustleModal = document.getElementById('hustle-detail-modal');
-const modalBody = document.getElementById('modal-body');
-const modalOverlay = hustleModal.querySelector('.modal-overlay');
-const modalCloseBtn = hustleModal.querySelector('.modal-close-btn');
-
-// --- Simulation Functions (Replace with actual API calls) ---
-
-// Keep track of previously shown featured hustles to ensure uniqueness
-const seenFeaturedHustles = new Set();
-
-// Simulates fetching featured hustle summaries
-// Placeholder for: [Gemini API: get_featured_hustles(count=3, format='summary')]
-async function simulateFetchFeaturedHustles() {
-    console.log("Simulating fetch for featured hustles...");
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 400)); 
     
-    // Sample data - replace with actual API response structure
-    const hustles = [
-        {
-            id: 'feat-photo-lon',
-            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`, // Camera icon
-            title: 'Event Photographer',
-            location: 'London',
-            snippet: 'Capture memories at local events & parties.'
-        },
-        {
-            id: 'feat-guide-par',
-            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 11l0 6"></path><path d="M12 7l0-1"></path></svg>`, // Shield/Guide icon
-            title: 'Niche Walking Tours',
-            location: 'Paris',
-            snippet: 'Lead themed tours (history, food, art) off the beaten path.'
-        },
-        {
-            id: 'feat-bake-nyc',
-            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>`, // Whisk/Baking icon
-            title: 'Custom Celebration Cakes',
-            location: 'New York',
-            snippet: 'Bake and sell unique cakes for birthdays & special occasions.'
+    // Function to close the menu and restore scroll
+    const closeMenu = () => {
+        if (navLinks.classList.contains('active')) {
+             navLinks.classList.remove('active');
+             menuToggle.classList.remove('is-active');
+             
+             // Restore scroll position
+             document.body.classList.remove('menu-open');
+             document.body.style.top = '';
+             // Use a slight delay before scrolling to avoid layout jumps
+             requestAnimationFrame(() => {
+                 window.scrollTo(0, scrollPosition);
+             });
         }
-    ];
-    // Randomize results slightly for refresh effect
-    return hustles.sort(() => 0.5 - Math.random());
-}
-
-// Helper function to get appropriate SVG icon based on type description
-function getIconSvgForType(iconType) {
-    // Lowercase and simplify the icon type
-    const type = (iconType || '').toLowerCase().trim();
-    
-    // Map of common keywords to SVG icons
-    const iconMap = {
-        // Photography/Camera related
-        camera: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
-        photo: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
-        
-        // Food related
-        food: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>`,
-        cook: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>`,
-        bake: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z"></path></svg>`,
-        
-        // Tech/Coding related
-        tech: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`,
-        code: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`,
-        computer: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`,
-        
-        // Travel/Location related
-        travel: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 11l0 6"></path><path d="M12 7l0-1"></path></svg>`,
-        map: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>`,
-        location: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 11l0 6"></path><path d="M12 7l0-1"></path></svg>`,
-        
-        // Pet related
-        pet: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.172C10 3.782 8.423 2.679 6.5 3c-2.823.47-4.113 6.006-4 7 .08.703 1.725 1.722 3.656 1 1.261-.472 1.96-1.45 2.344-2.5"></path><path d="M14.5 5.172c0-1.39 1.577-2.493 3.5-2.172 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.96-1.45-2.344-2.5"></path><path d="M8 14v.5"></path><path d="M16 14v.5"></path><path d="M11.25 16.25h1.5L12 17l-.75-.75Z"></path><path d="M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444c0-1.061-.162-2.2-.493-3.309m-9.243-6.082A8.801 8.801 0 0 1 12 5c.78 0 1.5.108 2.161.304"></path></svg>`,
-        dog: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.172C10 3.782 8.423 2.679 6.5 3c-2.823.47-4.113 6.006-4 7 .08.703 1.725 1.722 3.656 1 1.261-.472 1.96-1.45 2.344-2.5"></path><path d="M14.5 5.172c0-1.39 1.577-2.493 3.5-2.172 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.96-1.45-2.344-2.5"></path><path d="M8 14v.5"></path><path d="M16 14v.5"></path><path d="M11.25 16.25h1.5L12 17l-.75-.75Z"></path><path d="M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444c0-1.061-.162-2.2-.493-3.309m-9.243-6.082A8.801 8.801 0 0 1 12 5c.78 0 1.5.108 2.161.304"></path></svg>`,
-        
-        // Design related
-        design: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>`,
-        art: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>`,
-        
-        // Fitness related
-        fitness: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M15 10v4"></path><path d="M9 10v4"></path><path d="M12 8v8"></path></svg>`,
-        exercise: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M15 10v4"></path><path d="M9 10v4"></path><path d="M12 8v8"></path></svg>`,
-        
-        // Education related
-        teach: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10L4 6l8-4 8 4-8 4z"></path><path d="M4 6v6c0 3.314 3.582 6 8 6s8-2.686 8-6V6"></path><line x1="12" y1="22" x2="12" y2="16"></line></svg>`,
-        tutor: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10L4 6l8-4 8 4-8 4z"></path><path d="M4 6v6c0 3.314 3.582 6 8 6s8-2.686 8-6V6"></path><line x1="12" y1="22" x2="12" y2="16"></line></svg>`,
-        education: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10L4 6l8-4 8 4-8 4z"></path><path d="M4 6v6c0 3.314 3.582 6 8 6s8-2.686 8-6V6"></path><line x1="12" y1="22" x2="12" y2="16"></line></svg>`,
     };
+
+    // Close menu when clicking a link
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', closeMenu);
+    });
     
-    // Try to match icon type with our map
-    for (const [key, svg] of Object.entries(iconMap)) {
-        if (type.includes(key)) {
-            return svg;
+    // Close menu when clicking outside (on the overlay)
+    document.addEventListener('click', function(event) {
+        // Check if the click is directly on the overlay (body::after)
+        // We can check if the click is outside the navLinks and not on the toggle button
+        if (navLinks.classList.contains('active') && 
+            !navLinks.contains(event.target) && 
+            !menuToggle.contains(event.target)) {
+            // Make sure the click wasn't inside the navLinks container itself
+            if (event.target === document.body || event.target.closest('body')) { 
+                 // Check if body has menu-open class to infer overlay click
+                 if (document.body.classList.contains('menu-open')) {
+                     closeMenu();
+                 }
+            }
         }
+    });
+}
+
+// Ensure the function is called after the DOM is ready
+// Moved the DOMContentLoaded listener that calls setupMobileMenu to ensure it's defined first
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up listeners for the main page
+    setupMainPageListeners();
+    
+    // Handle mobile menu
+    setupMobileMenu();
+    
+    // Initialize particles.js
+    if (document.getElementById('particles-js')) {
+        initParticles();
     }
     
-    // Default icon if no match
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
-}
+    // Load featured hustles
+    loadFeaturedHustles();
+    
+    // Set up quick search functionality
+    setupQuickSearch();
+});
 
-// Fetches full details for a specific hustle ID from Gemini API
-// Implementation for: [Gemini API: get_hustle_details(id=hustleId)]
-async function simulateFetchFullHustleDetails(hustleId) {
-    console.log(`Fetching full details for hustle: ${hustleId}`);
+// Add this function to fetch featured hustles from Gemini API
+async function loadFeaturedHustles() {
+    const inspirationSection = document.getElementById('inspiration-section');
+    if (!inspirationSection) return;
+    
+    const cardsContainer = inspirationSection.querySelector('.inspiration-cards-container');
+    if (!cardsContainer) return;
     
     try {
-        // Extract information from the hustle ID to help with prompt
-        const [category, location] = hustleId.split('-');
-        
-        // Create a prompt for Gemini to generate detailed information
-        const prompt = `Generate detailed business information for a side hustle with ID "${hustleId}".
-        
-Based on this ID, create a comprehensive profile for a ${category} business in ${location || 'any location'}.
-
-Format your response with this HTML structure:
-<h3 id="modal-title">[Catchy Business Name (Location)]</h3>
-<div>
-  <p>[Detailed 2-3 sentence description of what this business does and why it's viable]</p>
-  <strong>Key Steps:</strong>
-  <ul>
-    <li>[Step 1 - be specific]</li>
-    <li>[Step 2 - be specific]</li>
-    <li>[Step 3 - be specific]</li>
-    <li>[Step 4 - be specific]</li>
-  </ul>
-  <strong>Potential Earnings:</strong> [Realistic income range with currency]
-</div>
-
-Make the content practical, realistic, and detailed enough for someone to actually start this business.`;
-
-        // Make the API call
+        // Try to fetch featured hustles from Gemini API
         const response = await fetch(`${GEMINI_CONFIG.API_URL}?key=${GEMINI_CONFIG.API_KEY}`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [
-                    {
-                        parts: [
-                            { text: prompt }
-                        ]
-                    }
-                ],
-                safetySettings: [
-                    {
-                        category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-                        threshold: "BLOCK_ONLY_HIGH"
-                    }
-                ],
+                contents: [{
+                    parts: [{
+                        text: "Generate 3 brief hustle ideas in this EXACT format (nothing before or after):\n" +
+                              "1. Hustle: [hustle name]\n" +
+                              "   Location: [random major city]\n" +
+                              "   Description: [single short sentence]\n" +
+                              "   Icon: [one of: camera, map-pin, code, paint, coffee, book, truck, leaf, music]\n\n" +
+                              "2. Hustle: [hustle name]\n" +
+                              "   Location: [different random major city]\n" +
+                              "   Description: [single short sentence]\n" +
+                              "   Icon: [one of: camera, map-pin, code, paint, coffee, book, truck, leaf, music]\n\n" +
+                              "3. Hustle: [hustle name]\n" +
+                              "   Location: [different random major city]\n" +
+                              "   Description: [single short sentence]\n" +
+                              "   Icon: [one of: camera, map-pin, code, paint, coffee, book, truck, leaf, music]"
+                    }]
+                }],
+                safetySettings: [{
+                    category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                    threshold: "BLOCK_ONLY_HIGH"
+                }],
                 generationConfig: {
-                    maxOutputTokens: 1024,
-                    temperature: 0.7,
-                    topP: 0.95,
+                    maxOutputTokens: 250,
+                    temperature: 1.0,
+                    topP: 0.9,
                     topK: 40
                 }
             })
         });
 
-        if (!response.ok) {
-            throw new Error(`API Error: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        
         const data = await response.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const textResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
         
-        // Extract HTML content
-        const titleMatch = text.match(/<h3[^>]*>(.*?)<\/h3>/s);
-        const contentMatch = text.match(/<div[^>]*>([\s\S]*?)<\/div>/s);
+        // Parse the response
+        const hustleItems = textResponse.split(/\d+\.\s+/).filter(item => item.trim().length > 0);
         
-        if (titleMatch && contentMatch) {
-            return {
-                title: titleMatch[1],
-                content: contentMatch[1]
-            };
+        if (hustleItems && hustleItems.length > 0) {
+            // Clear existing cards
+            cardsContainer.innerHTML = '';
+            
+            // Process each hustle idea
+            hustleItems.forEach(item => {
+                const hustleMatch = item.match(/Hustle:\s*(.+?)(?:\n|$)/);
+                const locationMatch = item.match(/Location:\s*(.+?)(?:\n|$)/);
+                const descriptionMatch = item.match(/Description:\s*(.+?)(?:\n|$)/);
+                const iconMatch = item.match(/Icon:\s*(.+?)(?:\n|$)/);
+                
+                if (hustleMatch && locationMatch && descriptionMatch) {
+                    const hustleName = hustleMatch[1].trim();
+                    const location = locationMatch[1].trim();
+                    const description = descriptionMatch[1].trim();
+                    const icon = (iconMatch && iconMatch[1].trim()) || "camera";
+                    
+                    // Create card with the data
+                    createFeaturedHustleCard(hustleName, location, description, icon, cardsContainer);
+                }
+            });
+            
+            // Add click handlers to the cards
+            setupFeaturedHustleCardListeners();
         } else {
-            // If structure doesn't match, return the whole text as content
-            return {
-                title: 'Hustle Details',
-                content: text
-            };
+            throw new Error("Failed to parse featured hustles");
         }
     } catch (error) {
-        console.error("Error fetching hustle details:", error);
-        // Return a graceful error message
-        return { 
-            title: 'Details Temporarily Unavailable',
-            content: '<p>We couldn\'t load the details for this hustle right now. Please try again later.</p>'
-        };
+        console.warn("Failed to load featured hustles:", error);
+        // Fallback to placeholder hustles - keep existing content
     }
 }
 
-// --- Rendering Functions ---
-
-function renderFeaturedHustles(hustles) {
-    if (!inspirationContainer) return;
-    inspirationContainer.innerHTML = ''; // Clear existing placeholders or cards
-
-    if (!hustles || hustles.length === 0) {
-        inspirationContainer.innerHTML = '<p class="inspiration-error">Could not load inspiration ideas right now.</p>';
-        return;
+// Function to create a featured hustle card
+function createFeaturedHustleCard(hustleName, location, description, iconType, container) {
+    // Define icon SVG based on iconType
+    let iconSvg = '';
+    
+    switch (iconType.toLowerCase()) {
+        case 'camera':
+            iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
+            break;
+        case 'map-pin':
+            iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 11l0 6"></path><path d="M12 7l0-1"></path></svg>';
+            break;
+        case 'code':
+            iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>';
+            break;
+        case 'paint':
+            iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>';
+            break;
+        case 'coffee':
+            iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>';
+            break;
+        case 'book':
+            iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>';
+            break;
+        case 'truck':
+            iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17h4V5H2v12h3"></path><path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L16 6h-4v11h3"></path><circle cx="7.5" cy="17.5" r="2.5"></circle><circle cx="17.5" cy="17.5" r="2.5"></circle></svg>';
+            break;
+        case 'leaf':
+            iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22c1.25-1.25 2.5-2.5 3.5-4.5 1.17 2.25 2.92 3.5 5 4 2.97.7 6.14.56 9-1.5C15 16 11.5 9.5 9.5 6.5c-1.5 3.5-2 7-1.5 10.5-2.5-2.5-2.5-6.5-1.5-9.5-1.5 1.5-3.5 3.5-5 6.5-.5-1.5-1-4.5-2.5-7.5C.5 16 1 19.5 2 22z"/></svg>';
+            break;
+        case 'music':
+            iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="15.5" r="2.5"/><path d="M20 2v10c0 1.1-.9 2-2 2h-1l-6-4H5.5C4.12 10 3 8.88 3 7.5S4.12 5 5.5 5H10l6-3h2c1.1 0 2 .9 2 2z"/></svg>';
+            break;
+        default:
+            iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
     }
+    
+    // Create the card HTML
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'inspiration-card';
+    cardDiv.setAttribute('data-hustle-name', hustleName);
+    cardDiv.setAttribute('data-location', location);
+    cardDiv.setAttribute('data-description', description);
+    
+    cardDiv.innerHTML = `
+        <div class="inspiration-card-icon">
+            ${iconSvg}
+        </div>
+        <div class="inspiration-card-content">
+            <h4>${hustleName}</h4>
+            <p>in ${location}</p>
+            <span>${description}</span>
+        </div>
+    `;
+    
+    // Add the card to the container
+    container.appendChild(cardDiv);
+}
 
-    hustles.forEach(hustle => {
-        const card = document.createElement('div');
-        card.className = 'inspiration-card';
-        card.setAttribute('data-hustle-id', hustle.id);
-        card.setAttribute('role', 'button'); // Make it clear it's interactive
-        card.setAttribute('tabindex', '0');   // Make it keyboard accessible
-        card.innerHTML = `
-            <div class="inspiration-card-icon">
-                ${hustle.icon || '<i>?</i>'} 
-            </div>
-            <div class="inspiration-card-content">
-                <h4>${hustle.title || 'Hustle Idea'}</h4>
-                ${hustle.location ? `<p>in ${hustle.location}</p>` : ''}
-                ${hustle.snippet ? `<span>${hustle.snippet}</span>` : ''}
-            </div>
-        `;
-        
-        // Add click listener to open modal
-        card.addEventListener('click', () => openHustleModal(hustle.id));
-        card.addEventListener('keydown', (event) => { // Add keyboard accessibility
-             if (event.key === 'Enter' || event.key === ' ') {
-                 openHustleModal(hustle.id);
-             }
-         });
+// Set up click listeners for featured hustle cards
+function setupFeaturedHustleCardListeners() {
+    const cards = document.querySelectorAll('.inspiration-card');
+    const popupOverlay = document.getElementById('hustle-popup-overlay');
+    const popupContent = document.querySelector('.hustle-popup-content');
+    const closeBtn = document.querySelector('.popup-close-btn');
+    
+    // Close popup when clicking the close button
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            popupOverlay.classList.remove('active');
+            // Enable body scroll
+            document.body.style.overflow = '';
+        });
+    }
+    
+    // Close popup when clicking outside the popup
+    if (popupOverlay) {
+        popupOverlay.addEventListener('click', (e) => {
+            if (e.target === popupOverlay) {
+                popupOverlay.classList.remove('active');
+                // Enable body scroll
+                document.body.style.overflow = '';
+            }
+        });
+    }
+    
+    cards.forEach(card => {
+        card.addEventListener('click', async function() {
+            const hustleName = this.getAttribute('data-hustle-name');
+            const location = this.getAttribute('data-location');
+            const description = this.getAttribute('data-description');
+            
+            // Show loading state in the popup
+            if (popupContent) {
+                popupContent.innerHTML = `
+                    <div class="loading-spinner" style="margin: 40px auto; text-align: center;">
+                        <div class="loader-circle"></div>
+                        <p>Loading hustle details for "${hustleName}" in ${location}...</p>
+                    </div>
+                `;
+                
+                // Show the popup
+                popupOverlay.classList.add('active');
+                // Disable body scroll when popup is open
+                document.body.style.overflow = 'hidden';
+            }
+            
+            try {
+                // More structured prompt with clear formatting instructions
+                const hustlePrompt = `Create a complete hustle opportunity profile for "${hustleName}" in ${location}. 
+Brief description: ${description || "A local business opportunity"}
 
-        inspirationContainer.appendChild(card);
+Follow this EXACT format with NO DEVIATIONS:
+
+Name: ${hustleName}
+
+Executive Summary: 
+[2-3 sentences describing the hustle in detail]
+
+Difficulty: [Easy/Medium/Hard]
+
+Profitability: [$X-$Y/month]
+
+Cost: [$Z initial investment (what this covers)]
+
+Key Metrics:
+Startup Time: [X-Y weeks/months]
+Break-even Point: [X-Y months]
+Scalability: [Low/Medium/High - brief explanation]
+
+Action Plan (First Month):
+Week 1: [specific action]
+Week 2: [specific action]
+Week 3: [specific action]
+Week 4: [specific action]
+
+Resources:
+Tools: [tool 1], [tool 2], [tool 3]
+Platforms: [platform 1], [platform 2]
+Communities: [community 1], [community 2]
+
+Monetization:
+1. [primary revenue stream with pricing]
+2. [secondary revenue stream with pricing]
+3. [tertiary revenue stream with pricing]
+
+Risk Analysis:
+- Challenge: [specific issue]
+  Solution: [specific approach]
+- Challenge: [specific issue]
+  Solution: [specific approach]`;
+                
+                // Call Gemini API to get the full hustle details
+                const response = await fetch(`${GEMINI_CONFIG.API_URL}?key=${GEMINI_CONFIG.API_KEY}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: hustlePrompt }]
+                        }],
+                        safetySettings: [{
+                            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                            threshold: "BLOCK_ONLY_HIGH"
+                        }],
+                        generationConfig: {
+                            maxOutputTokens: 1024,
+                            temperature: 0.7,
+                            topP: 0.9,
+                            topK: 40
+                        }
+                    })
+                });
+
+                if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                
+                const data = await response.json();
+                const textResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+                
+                // Parse the response into a hustle object
+                const hustle = parseHustleText(textResponse);
+                
+                // Render the hustle in the popup
+                renderHustleInPopup(hustle, location);
+                
+            } catch (error) {
+                console.error("Failed to load full hustle details:", error);
+                
+                // Fallback: Create a generic hustle based on the card data
+                const fallbackHustle = createFallbackHustleFromCard(hustleName, location, this.getAttribute('data-description'));
+                
+                // Render the fallback hustle in the popup
+                renderHustleInPopup(fallbackHustle, location);
+            }
+        });
     });
 }
 
-// --- Modal Functions ---
-
-async function openHustleModal(hustleId) {
-    if (!hustleModal || !modalBody) return;
-
-    // Show modal and initial loader
-    modalBody.innerHTML = '<div class="loading-spinner"></div>'; 
-    hustleModal.hidden = false;
-    document.body.style.overflow = 'hidden'; // Prevent background scrolling
-    // Use a slight delay to allow the hidden attribute removal to register before transition starts
-    setTimeout(() => hustleModal.classList.add('is-visible'), 10);
-
-    try {
-        // Fetch full details
-        const details = await simulateFetchFullHustleDetails(hustleId);
-        
-        // Display details in modal
-        modalBody.innerHTML = `
-            <h3 id="modal-title">${details.title}</h3>
-            <div>${details.content}</div>
-        `;
-    } catch (error) {
-        console.error("Error fetching hustle details:", error);
-        modalBody.innerHTML = '<p class="error-text">Could not load details. Please try again later.</p>';
-    }
-}
-
-function closeModal() {
-    if (!hustleModal) return;
-    hustleModal.classList.remove('is-visible');
-    document.body.style.overflow = ''; // Restore background scrolling
+// Render hustle details in the popup
+function renderHustleInPopup(hustle, location) {
+    const popupContent = document.querySelector('.hustle-popup-content');
+    if (!popupContent) return;
     
-    // Wait for transition to finish before hiding and clearing
-    hustleModal.addEventListener('transitionend', () => {
-        hustleModal.hidden = true;
-        modalBody.innerHTML = ''; // Clear content after hiding
-    }, { once: true });
-}
-
-// --- Event Listeners & Interval ---
-
-// Close modal listeners
-if (modalOverlay && modalCloseBtn) {
-    modalOverlay.addEventListener('click', closeModal);
-    modalCloseBtn.addEventListener('click', closeModal);
-}
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && hustleModal.classList.contains('is-visible')) {
-        closeModal();
+    // Create the HTML content for the popup
+    let html = `
+        <div class="popup-hustle-card">
+            <div class="popup-hustle-header">
+                <h2 id="popup-title">${hustle.name || 'Hustle Opportunity'}</h2>
+                <div class="popup-hustle-location">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        <circle cx="12" cy="7" r="1"></circle>
+                    </svg>
+                    ${location || 'Location not specified'}
+                </div>
+                <div class="popup-hustle-summary">${hustle.summary || 'A unique business opportunity with growth potential.'}</div>
+                <div class="popup-hustle-metrics">
+                    <div class="popup-metric">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                        </svg>
+                        <span><strong>Difficulty:</strong> ${hustle.difficulty || 'Medium'}</span>
+                    </div>
+                    <div class="popup-metric">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                        <span><strong>Profit:</strong> ${hustle.profitability || '$500-$2000/month'}</span>
+                    </div>
+                    <div class="popup-metric">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                        <span><strong>Cost:</strong> ${hustle.cost || '$200-$1000 (initial setup)'}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="popup-hustle-body">
+                <div class="popup-section">
+                    <h3>Key Metrics</h3>
+                    <div class="popup-resources">
+                        <div class="popup-resource-item">
+                            <strong>Startup Time</strong>
+                            <p>${hustle.metrics?.startupTime || '4-6 weeks'}</p>
+                        </div>
+                        <div class="popup-resource-item">
+                            <strong>Break-even Point</strong>
+                            <p>${hustle.metrics?.breakEven || '3-6 months'}</p>
+                        </div>
+                        <div class="popup-resource-item">
+                            <strong>Scalability</strong>
+                            <p>${hustle.metrics?.scalability || 'Medium - Can grow with additional resources'}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="popup-section">
+                    <h3>Action Plan (First Month)</h3>
+                    <div class="popup-timeline">
+                        ${hustle.actionPlan && hustle.actionPlan.length > 0 ? 
+                            hustle.actionPlan.map((plan, index) => `
+                                <div class="popup-timeline-item">
+                                    <div class="popup-timeline-marker">${index + 1}</div>
+                                    <div class="popup-timeline-content">${plan}</div>
+                                </div>
+                            `).join('') : 
+                            '<div class="empty-message">No action plan available</div>'
+                        }
+                    </div>
+                </div>
+                
+                <div class="popup-section">
+                    <h3>Resources</h3>
+                    <div class="popup-resources">
+                        <div class="popup-resource-item">
+                            <strong>🛠️ Tools</strong>
+                            <ul>
+                                ${hustle.resources?.tools && hustle.resources.tools.length > 0 ? 
+                                    hustle.resources.tools.map(tool => `<li>${tool}</li>`).join('') :
+                                    '<li>Basic equipment</li><li>Social media management tools</li>'
+                                }
+                            </ul>
+                        </div>
+                        <div class="popup-resource-item">
+                            <strong>💻 Platforms</strong>
+                            <ul>
+                                ${hustle.resources?.platforms && hustle.resources.platforms.length > 0 ? 
+                                    hustle.resources.platforms.map(platform => `<li>${platform}</li>`).join('') :
+                                    '<li>Social media</li><li>Local online marketplace</li>'
+                                }
+                            </ul>
+                        </div>
+                        <div class="popup-resource-item">
+                            <strong>👥 Communities</strong>
+                            <ul>
+                                ${hustle.resources?.communities && hustle.resources.communities.length > 0 ? 
+                                    hustle.resources.communities.map(community => `<li>${community}</li>`).join('') :
+                                    '<li>Local business network</li><li>Online entrepreneur forums</li>'
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="popup-section">
+                    <h3>Monetization Streams</h3>
+                    <div class="popup-monetization">
+                        ${hustle.monetization && hustle.monetization.length > 0 ? 
+                            hustle.monetization.map((stream, index) => `
+                                <div class="popup-monetization-item">
+                                    <div class="popup-monetization-number">${index + 1}</div>
+                                    <div class="popup-monetization-content">${stream}</div>
+                                </div>
+                            `).join('') :
+                            '<div class="empty-message">Monetization details not available</div>'
+                        }
+                    </div>
+                </div>
+                
+                <div class="popup-section">
+                    <h3>Risk Analysis</h3>
+                    <div class="popup-risks">
+                        ${hustle.risks && hustle.risks.length > 0 ? 
+                            hustle.risks.map(risk => `
+                                <div class="popup-risk-item">
+                                    <div class="popup-risk-challenge">
+                                        <strong>⚠️ Challenge:</strong> ${risk.challenge || 'Market competition'}
+                                    </div>
+                                    ${risk.impact ? `<div class="popup-risk-impact"><strong>📊 Impact:</strong> ${risk.impact}</div>` : ''}
+                                    <div class="popup-risk-solution">
+                                        <strong>💡 Solution:</strong> ${risk.solution || 'Develop a unique value proposition'}
+                                    </div>
+                                    ${risk.expected ? `<div class="popup-risk-expected"><strong>📈 Expected:</strong> ${risk.expected}</div>` : ''}
+                                </div>
+                            `).join('') :
+                            '<div class="empty-message">Risk analysis not available</div>'
+                        }
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="save-popup-hustle-btn" style="background: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Save This Hustle
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Set the HTML content
+    popupContent.innerHTML = html;
+    
+    // Add event listener to save button
+    const saveButton = popupContent.querySelector('.save-popup-hustle-btn');
+    if (saveButton) {
+        saveButton.addEventListener('click', function() {
+            // Save hustle to local storage
+            saveHustle(hustle);
+            
+            // Update button
+            this.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Saved!
+            `;
+            this.style.background = 'var(--success-color)';
+        });
     }
-});
+}
 
-// Fetch and render featured hustles on initial load
-document.addEventListener('DOMContentLoaded', async () => {
+// Save hustle to local storage
+function saveHustle(hustle) {
     try {
-        const initialHustles = await simulateFetchFeaturedHustles();
-        renderFeaturedHustles(initialHustles);
+        // Get existing saved hustles
+        let savedHustles = JSON.parse(localStorage.getItem('savedHustles') || '[]');
+        
+        // Check if hustle already exists
+        const hustleExists = savedHustles.some(saved => saved.name === hustle.name);
+        
+        // If it doesn't exist, add it
+        if (!hustleExists) {
+            savedHustles.push(hustle);
+            localStorage.setItem('savedHustles', JSON.stringify(savedHustles));
+        }
     } catch (error) {
-        console.error("Failed to load initial featured hustles:", error);
-        if (inspirationContainer) {
-            inspirationContainer.innerHTML = '<p class="inspiration-error">Failed to load initial ideas.</p>';
+        console.error('Error saving hustle:', error);
+    }
+}
+
+// Parse hustle text from Gemini API response
+function parseHustleText(text) {
+    // Create an empty hustle object
+    const hustle = {
+        name: "",
+        summary: "",
+        difficulty: "",
+        profitability: "",
+        cost: "",
+        metrics: {
+            startupTime: "",
+            breakEven: "",
+            scalability: ""
+        },
+        actionPlan: [],
+        resources: {
+            tools: [],
+            platforms: [],
+            communities: []
+        },
+        monetization: [],
+        risks: []
+    };
+    
+    // Check if we have valid response text
+    if (!text || text.trim().length === 0) {
+        console.error("Empty or invalid text response from API");
+        return hustle;
+    }
+    
+    console.log("Raw text from API:", text.substring(0, 100) + "..."); // Debug logging
+    
+    // Extract data with regex - improved patterns for better matching
+    const nameMatch = text.match(/Name:\s*(.+?)(?=\n|Executive|$)/i);
+    if (nameMatch) hustle.name = nameMatch[1].trim();
+    
+    const summaryMatch = text.match(/Executive Summary:\s*(.+?)(?=\n\s*Difficulty|Difficulty:|$)/is);
+    if (summaryMatch) hustle.summary = summaryMatch[1].trim();
+    
+    const difficultyMatch = text.match(/Difficulty:\s*(.+?)(?=\n\s*Profitability|Profitability:|$)/i);
+    if (difficultyMatch) hustle.difficulty = difficultyMatch[1].trim();
+    
+    const profitabilityMatch = text.match(/Profitability:\s*(.+?)(?=\n\s*Cost|Cost:|$)/i);
+    if (profitabilityMatch) hustle.profitability = profitabilityMatch[1].trim();
+    
+    const costMatch = text.match(/Cost:\s*(.+?)(?=\n\s*Key Metrics|Key Metrics:|$)/i);
+    if (costMatch) hustle.cost = costMatch[1].trim();
+    
+    // Extract metrics - improved pattern to better handle multiline content
+    const metricsSection = text.match(/Key Metrics:(.+?)(?=\n\s*Action Plan|Action Plan \(First Month\):|$)/is);
+    if (metricsSection) {
+        const metrics = metricsSection[1];
+        console.log("Metrics section:", metrics); // Debug logging
+        
+        const startupMatch = metrics.match(/Startup Time:\s*(.+?)(?=\n\s*Break-even|Break-even Point:|$)/i);
+        if (startupMatch) hustle.metrics.startupTime = startupMatch[1].trim();
+        
+        const breakEvenMatch = metrics.match(/Break-even Point:\s*(.+?)(?=\n\s*Scalability|Scalability:|$)/i);
+        if (breakEvenMatch) hustle.metrics.breakEven = breakEvenMatch[1].trim();
+        
+        const scalabilityMatch = metrics.match(/Scalability:\s*(.+?)(?=\n\n|$)/is);
+        if (scalabilityMatch) hustle.metrics.scalability = scalabilityMatch[1].trim();
+    }
+    
+    // Extract action plan - improved to handle different formatting
+    const actionPlanSection = text.match(/Action Plan \(?First Month\)?:(.+?)(?=\n\s*Resources|Resources:|$)/is);
+    if (actionPlanSection) {
+        const actionPlan = actionPlanSection[1];
+        console.log("Action Plan section:", actionPlan.substring(0, 100) + "..."); // Debug logging
+        
+        // Match both Week X: format and numbered list format (1., 2., etc.)
+        const weekActions = actionPlan.match(/(?:Week \d+:|^\d+\.)\s*.*?(?=\n\s*(?:Week \d+:|^\d+\.)|$)/gm);
+        if (weekActions && weekActions.length > 0) {
+            hustle.actionPlan = weekActions.map(action => action.trim());
+        } else {
+            // Fallback to simpler line-by-line extraction if no week pattern is found
+            const lines = actionPlan.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+            if (lines.length > 0) hustle.actionPlan = lines;
         }
     }
-});
-
-// Refresh featured hustles every 5 minutes
-const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
-setInterval(async () => {
-    console.log("Refreshing featured hustles...");
-    try {
-        const refreshedHustles = await simulateFetchFeaturedHustles();
-        renderFeaturedHustles(refreshedHustles);
-    } catch (error) {
-        console.error("Failed to refresh featured hustles:", error);
-        // Optionally display a subtle error or just log it
+    
+    // Extract resources - improved to handle different formatting
+    const resourcesSection = text.match(/Resources:(.+?)(?=\n\s*Monetization|Monetization:|$)/is);
+    if (resourcesSection) {
+        const resources = resourcesSection[1];
+        console.log("Resources section:", resources.substring(0, 100) + "..."); // Debug logging
+        
+        const toolsMatch = resources.match(/Tools:\s*(.+?)(?=\n\s*Platforms|Platforms:|$)/i);
+        if (toolsMatch) {
+            hustle.resources.tools = toolsMatch[1]
+                .split(/,|\n/)
+                .map(tool => tool.trim())
+                .filter(tool => tool.length > 0);
+        }
+        
+        const platformsMatch = resources.match(/Platforms:\s*(.+?)(?=\n\s*Communities|Communities:|$)/i);
+        if (platformsMatch) {
+            hustle.resources.platforms = platformsMatch[1]
+                .split(/,|\n/)
+                .map(platform => platform.trim())
+                .filter(platform => platform.length > 0);
+        }
+        
+        const communitiesMatch = resources.match(/Communities:\s*(.+?)(?=\n\n|$)/is);
+        if (communitiesMatch) {
+            hustle.resources.communities = communitiesMatch[1]
+                .split(/,|\n/)
+                .map(community => community.trim())
+                .filter(community => community.length > 0);
+        }
     }
-}, REFRESH_INTERVAL);
+    
+    // Extract monetization - improved to handle different formatting
+    const monetizationSection = text.match(/Monetization:(.+?)(?=\n\s*Risk Analysis|Risk Analysis:|$)/is);
+    if (monetizationSection) {
+        const monetization = monetizationSection[1];
+        console.log("Monetization section:", monetization.substring(0, 100) + "..."); // Debug logging
+        
+        // Try to match numbered items (e.g., "1. Item")
+        const streams = monetization.match(/\d+\.\s*.*?(?=\n\s*\d+\.|$)/gs);
+        if (streams && streams.length > 0) {
+            hustle.monetization = streams.map(stream => 
+                stream.replace(/^\d+\.\s*/, '').trim()
+            );
+        } else {
+            // Fallback to line-by-line if no numbered format
+            const lines = monetization.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0 && !line.match(/^\s*Monetization:/i));
+            if (lines.length > 0) hustle.monetization = lines;
+        }
+    }
+    
+    // Extract risk analysis - improved to handle different formatting
+    const riskAnalysisSection = text.match(/Risk Analysis:(.+?)(?=$)/is);
+    if (riskAnalysisSection) {
+        const riskText = riskAnalysisSection[1];
+        console.log("Risk Analysis section:", riskText.substring(0, 100) + "..."); // Debug logging
+        
+        // Try to match challenge/solution pairs in various formats
+        const challenges = riskText.match(/(?:Challenge:|[-•])\s*(.+?)(?:\n\s*Solution:|\n\s*→\s*Solution:)(.+?)(?=\n\s*(?:Challenge:|[-•])|$)/gs);
+        
+        if (challenges && challenges.length > 0) {
+            challenges.forEach(challengeBlock => {
+                const challengeMatch = challengeBlock.match(/(?:Challenge:|[-•])\s*(.+?)(?:\n\s*Solution:|\n\s*→\s*Solution:)/s);
+                const solutionMatch = challengeBlock.match(/(?:Solution:|\n\s*→\s*Solution:)\s*(.+?)(?=$)/s);
+                
+                if (challengeMatch && solutionMatch) {
+                    hustle.risks.push({
+                        challenge: challengeMatch[1].trim(),
+                        solution: solutionMatch[1].trim()
+                    });
+                }
+            });
+        } else {
+            // Fallback to simpler extraction by line pairs
+            const lines = riskText.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+            
+            for (let i = 0; i < lines.length; i += 2) {
+                if (i + 1 < lines.length) {
+                    hustle.risks.push({
+                        challenge: lines[i].replace(/^[-•]\s*/, ''),
+                        solution: lines[i + 1]
+                    });
+                }
+            }
+        }
+    }
+    
+    // If we have empty fields after parsing, let's provide fallbacks for critical sections
+    if (hustle.metrics.startupTime === "") hustle.metrics.startupTime = "4-6 weeks";
+    if (hustle.metrics.breakEven === "") hustle.metrics.breakEven = "3-6 months";
+    if (hustle.metrics.scalability === "") hustle.metrics.scalability = "Medium - Can grow with additional resources";
+    
+    if (hustle.actionPlan.length === 0) {
+        hustle.actionPlan = [
+            "Week 1: Research the market and competition",
+            "Week 2: Set up necessary accounts and infrastructure",
+            "Week 3: Create initial marketing materials and online presence",
+            "Week 4: Launch initial services and gather feedback"
+        ];
+    }
+    
+    if (hustle.resources.tools.length === 0) {
+        hustle.resources.tools = ["Basic equipment", "Social media management tools", "Accounting software"];
+    }
+    
+    if (hustle.resources.platforms.length === 0) {
+        hustle.resources.platforms = ["Instagram", "Local online marketplace"];
+    }
+    
+    if (hustle.resources.communities.length === 0) {
+        hustle.resources.communities = ["Local business network", "Online industry forums"];
+    }
+    
+    if (hustle.monetization.length === 0) {
+        hustle.monetization = [
+            "Direct sales of products/services: $25-75 per transaction",
+            "Subscription model: $15-30/month for premium offerings",
+            "Partnerships with complementary businesses: 10-15% commission"
+        ];
+    }
+    
+    if (hustle.risks.length === 0) {
+        hustle.risks = [
+            {
+                challenge: "Market competition",
+                solution: "Focus on unique value proposition and exceptional customer service"
+            },
+            {
+                challenge: "Seasonal demand fluctuations",
+                solution: "Develop diversified offerings to maintain consistent revenue"
+            }
+        ];
+    }
+    
+    console.log("Parsed hustle object:", hustle); // Debug the final object
+    
+    return hustle;
+}
 
-// --- End Inspiration Section Logic ---
+// Create a fallback hustle if API fails
+function createFallbackHustleFromCard(name, location, description) {
+    return {
+        name: name,
+        summary: description || `A unique business opportunity in ${location} that offers potential for growth and profitability.`,
+        difficulty: "Medium",
+        profitability: "$500 - $2000/month",
+        cost: "$200 - $1000 (initial setup)",
+        metrics: {
+            startupTime: "4-6 weeks",
+            breakEven: "3-6 months",
+            scalability: "Medium - Can grow with additional resources"
+        },
+        actionPlan: [
+            "Week 1: Research the market and identify target customers in " + location,
+            "Week 2: Create a basic business plan and secure necessary permits",
+            "Week 3: Set up online presence and begin initial marketing",
+            "Week 4: Soft launch and gather initial feedback from customers"
+        ],
+        resources: {
+            tools: ["Social media management tools", "Basic accounting software", "Customer relationship management system"],
+            platforms: ["Instagram", "Facebook", "Local online marketplace"],
+            communities: [`${location} Business Association`, "Online entrepreneur groups"]
+        },
+        monetization: [
+            "Direct sales of products/services: $25-75 per transaction",
+            "Subscription model: $15-30/month for premium offerings",
+            "Partnerships with complementary businesses: 10-15% commission"
+        ],
+        risks: [
+            {
+                challenge: "Market competition in " + location,
+                solution: "Focus on unique value proposition and exceptional customer service"
+            },
+            {
+                challenge: "Seasonal demand fluctuations",
+                solution: "Develop diversified offerings to maintain consistent revenue throughout the year"
+            }
+        ]
+    };
+}
 
+// Set up quick search functionality
+function setupQuickSearch() {
+    const quickSearchBtn = document.getElementById('quick-search-btn');
+    const quickCityInput = document.getElementById('quick-city-input');
+    
+    if (quickSearchBtn && quickCityInput) {
+        quickSearchBtn.addEventListener('click', function() {
+            const city = quickCityInput.value.trim();
+            if (city) {
+                // Instead of triggering the main search, refresh the featured hustles
+                // for the specific city
+                refreshFeaturedHustlesForCity(city);
+                
+                // Show a small success message
+                quickSearchBtn.innerHTML = 'Refreshed!';
+                setTimeout(() => {
+                    quickSearchBtn.innerHTML = 'Find Trending Hustles';
+                }, 2000);
+            } else {
+                // Show a small hint if empty
+                quickCityInput.placeholder = "Please enter a city";
+                setTimeout(() => {
+                    quickCityInput.placeholder = "Your City";
+                }, 2000);
+            }
+        });
+        
+        // Allow pressing Enter in the input field to trigger search
+        quickCityInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                quickSearchBtn.click();
+            }
+        });
+    }
+}
 
-// Original script content continues below...
-// Make sure this new code doesn't conflict with existing variable names or functions
+// Function to refresh featured hustles for a specific city
+async function refreshFeaturedHustlesForCity(city) {
+    const inspirationSection = document.getElementById('inspiration-section');
+    if (!inspirationSection) return;
+    
+    const cardsContainer = inspirationSection.querySelector('.inspiration-cards-container');
+    if (!cardsContainer) return;
+    
+    // Add loading indicator to the cards container
+    cardsContainer.innerHTML = `
+        <div style="text-align: center; padding: 30px; width: 100%;">
+            <div class="loading-spinner" style="margin: 0 auto 15px;"></div>
+            <p>Finding trending hustles in ${city}...</p>
+        </div>
+    `;
+    
+    try {
+        // Create a more specific prompt that targets the city
+        const response = await fetch(`${GEMINI_CONFIG.API_URL}?key=${GEMINI_CONFIG.API_KEY}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: `Generate 3 trending hustle ideas specifically for ${city} in this EXACT format (nothing before or after):
+                        
+1. Hustle: [hustle name appropriate for ${city}]
+   Location: ${city}
+   Description: [single short sentence explaining why this is a good hustle for ${city}]
+   Icon: [one of: camera, map-pin, code, paint, coffee, book, truck, leaf, music]
 
-// Example: Ensure existing DOMContentLoaded listener is handled correctly
-// If an existing listener exists, merge the logic or call the new function from within it.
+2. Hustle: [different hustle name appropriate for ${city}]
+   Location: ${city}
+   Description: [single short sentence explaining why this is a good hustle for ${city}]
+   Icon: [one of: camera, map-pin, code, paint, coffee, book, truck, leaf, music]
 
-// (Rest of the original script.js code...)
+3. Hustle: [different hustle name appropriate for ${city}]
+   Location: ${city}
+   Description: [single short sentence explaining why this is a good hustle for ${city}]
+   Icon: [one of: camera, map-pin, code, paint, coffee, book, truck, leaf, music]`
+                    }]
+                }],
+                safetySettings: [{
+                    category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                    threshold: "BLOCK_ONLY_HIGH"
+                }],
+                generationConfig: {
+                    maxOutputTokens: 350,
+                    temperature: 1.0,
+                    topP: 0.9,
+                    topK: 40
+                }
+            })
+        });
+
+        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        
+        const data = await response.json();
+        const textResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        
+        // Parse the response
+        const hustleItems = textResponse.split(/\d+\.\s+/).filter(item => item.trim().length > 0);
+        
+        if (hustleItems && hustleItems.length > 0) {
+            // Clear existing cards
+            cardsContainer.innerHTML = '';
+            
+            // Process each hustle idea
+            hustleItems.forEach(item => {
+                const hustleMatch = item.match(/Hustle:\s*(.+?)(?:\n|$)/);
+                const locationMatch = item.match(/Location:\s*(.+?)(?:\n|$)/);
+                const descriptionMatch = item.match(/Description:\s*(.+?)(?:\n|$)/);
+                const iconMatch = item.match(/Icon:\s*(.+?)(?:\n|$)/);
+                
+                if (hustleMatch && locationMatch && descriptionMatch) {
+                    const hustleName = hustleMatch[1].trim();
+                    const location = locationMatch[1].trim();
+                    const description = descriptionMatch[1].trim();
+                    const icon = (iconMatch && iconMatch[1].trim()) || "camera";
+                    
+                    // Create card with the data
+                    createFeaturedHustleCard(hustleName, location, description, icon, cardsContainer);
+                }
+            });
+            
+            // Add a small indication this was refreshed for this city
+            const titleElement = document.getElementById('inspiration-title');
+            if (titleElement) {
+                titleElement.textContent = `Trending Hustle Ideas in ${city}`;
+            }
+            
+            // Update the placeholder of the quick search input
+            const quickCityInput = document.getElementById('quick-city-input');
+            if (quickCityInput) {
+                quickCityInput.placeholder = city;
+            }
+            
+            // Add click handlers to the cards
+            setupFeaturedHustleCardListeners();
+        } else {
+            throw new Error("Failed to parse featured hustles");
+        }
+    } catch (error) {
+        console.warn("Failed to load featured hustles for city:", error);
+        
+        // Show an error message
+        cardsContainer.innerHTML = `
+            <div style="text-align: center; padding: 30px; width: 100%;">
+                <p>Could not find trending hustles for ${city}. Please try again.</p>
+                <button onclick="loadFeaturedHustles()" style="margin-top: 15px; padding: 8px 15px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                    Restore Default Hustles
+                </button>
+            </div>
+        `;
+    }
+}
+
+// ... rest of existing code ...

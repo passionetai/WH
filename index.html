@@ -23,8 +23,6 @@
     <link rel="icon" type="image/png" href="images/favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Nunito&family=Quicksand:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="mobile-menu-buttons.css">
-    <link rel="stylesheet" href="mobile-popup-fix.css">
     <!-- Particles.js CDN -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     
@@ -223,15 +221,6 @@
             <button class="city-btn" data-city="Shanghai" aria-label="Search hustles in Shanghai" tabindex="0">Shanghai</button>
             <button class="city-btn" data-city="Istanbul" aria-label="Search hustles in Istanbul" tabindex="0">Istanbul</button>
         </div>
-
-        <!-- Hustle Quiz CTA Section -->
-        <div class="quiz-cta-section">
-            <h3>Unsure Where to Begin?</h3>
-            <p>Find side hustles perfectly matched to your skills, interests, and availability.</p>
-            <a href="quiz.html" class="quiz-cta-button">Take the Hustle Quiz →</a>
-        </div>
-        <!-- End Hustle Quiz CTA Section -->
-
     </div>
 
     <div id="hustle-output" role="region" aria-label="Hustle search results">
@@ -281,6 +270,20 @@
 
     <!-- JavaScript Files -->
     <script src="script.js"></script>
-    <script src="gemini-featured-hustles.js"></script>
+    
+    <!-- Hustle Details Popup Modal -->
+    <div id="hustle-popup-overlay" class="hustle-popup-overlay" aria-hidden="true">
+        <div class="hustle-popup-container" role="dialog" aria-labelledby="popup-title" aria-modal="true">
+            <button class="popup-close-btn" aria-label="Close popup">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="hustle-popup-content">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
 </body>
 </html>
