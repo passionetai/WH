@@ -279,8 +279,13 @@
     justify-content: center;
     text-align: center;
     overflow: hidden;
+<<<<<<< HEAD
     position: relative;
     z-index: 1;
+=======
+    position: relative; /* Ensure relative positioning for the absolute buttons */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+>>>>>>> 1c2cc80d7726093eb1b4b2ee946ac99b1ecb2aaa
   }
 
   .city-btn::before {
@@ -1376,7 +1381,11 @@
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
+<<<<<<< HEAD
     padding: 1rem;
+=======
+    padding: 0.8rem 1rem;
+>>>>>>> 1c2cc80d7726093eb1b4b2ee946ac99b1ecb2aaa
   }
   
   .nav-logo {
@@ -2255,9 +2264,15 @@ input:focus {
   
   /* Add subtle animations */
   @keyframes pulse {
+<<<<<<< HEAD
     0% { transform: scale(1); }
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
+=======
+    0% { transform: scale(0.98); opacity: 0.8; }
+    50% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.98); opacity: 0.8; }
+>>>>>>> 1c2cc80d7726093eb1b4b2ee946ac99b1ecb2aaa
   }
   
   .guide-step:nth-child(1) {
@@ -2492,7 +2507,11 @@ body.menu-open {
     gap: 1rem;
     border: 1px solid #e5e5ea; /* Subtle border */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); /* Subtle shadow */
+<<<<<<< HEAD
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+=======
+    transition: transform 0.2s ease-in-out;
+>>>>>>> 1c2cc80d7726093eb1b4b2ee946ac99b1ecb2aaa
 }
 
 .inspiration-card:hover {
@@ -2548,7 +2567,11 @@ body.menu-open {
     display: flex;
     align-items: center;
     justify-content: center;
+<<<<<<< HEAD
     z-index: 1000;
+=======
+    z-index: 1100;
+>>>>>>> 1c2cc80d7726093eb1b4b2ee946ac99b1ecb2aaa
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
@@ -2593,9 +2616,15 @@ body.menu-open {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+<<<<<<< HEAD
     z-index: 10;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: all 0.2s ease;
+=======
+    transition: all 0.2s ease;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+>>>>>>> 1c2cc80d7726093eb1b4b2ee946ac99b1ecb2aaa
 }
 
 .popup-close-btn:hover {
@@ -2841,7 +2870,12 @@ body.menu-open {
 @media (max-width: 768px) {
     .hustle-popup-container {
         width: 95%;
+<<<<<<< HEAD
         max-height: 90vh;
+=======
+        max-height: 40vh;
+        overflow-y: auto;
+>>>>>>> 1c2cc80d7726093eb1b4b2ee946ac99b1ecb2aaa
     }
     
     .popup-hustle-metrics {
@@ -3008,4 +3042,12 @@ body.menu-open {
     margin: 0 auto 1.5rem;
     max-width: 600px;
     line-height: 1.5;
+<<<<<<< HEAD
+=======
+}
+
+/* Global Scroll Lock */
+body.body-scroll-locked {
+    overflow: hidden !important; /* Ensure this overrides other potential overflow styles */
+>>>>>>> 1c2cc80d7726093eb1b4b2ee946ac99b1ecb2aaa
 }
