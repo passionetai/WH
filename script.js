@@ -763,13 +763,6 @@ async function generateAlternativeHustle(city, previousHustles, seenModels, seen
   return parsedHustles[0];
 }
 
-document.addEventListener("DOMContentLoaded",(function(){
-    // Clear and hide the hustle output on initial load
-    const hustleOutput = document.getElementById("hustle-output");
-    hustleOutput.innerHTML = "";
-    hustleOutput.style.display = "none";
-    
-    const e=document.getElementById("city-input"),t=document.getElementById("get-hustle-btn"),n=document.querySelectorAll(".city-btn");t.addEventListener("click",(function(){const t=e.value.trim();t?(hustleOutput.style.display = "block", fetchHustleData(t)):(showError("Please enter a city name"),scrollToHustleOutput())})),n.forEach((t=>{t.addEventListener("click",(async function(){const t=this.textContent;n.forEach((e=>{e.disabled=!0,e.style.cursor="not-allowed"})),this.textContent="Loading...",this.classList.add("loading"),n.forEach((e=>e.classList.remove("active"))),this.classList.add("active");const i=this.getAttribute("data-city");e.value=i;try{hustleOutput.style.display = "block", await fetchHustleData(i),document.getElementById("hustle-output").scrollIntoView({behavior:"smooth"})}finally{this.textContent=t,this.classList.remove("loading"),n.forEach((e=>{e.disabled=!1,e.style.cursor = "pointer"}))}}))})),e.addEventListener("keypress",(async function(t){if("Enter"===t.key){const t=e.value.trim();if(t){hustleOutput.style.display = "block"; const e=document.querySelector(`.city-btn[data-city="${t}"]`);if(e){const n=e.textContent;e.textContent="Loading...",e.classList.add("loading"),document.querySelectorAll(".city-btn").forEach((e=>{e.disabled=!0,e.style.cursor="not-allowed"}));try{await fetchHustleData(t),document.querySelectorAll(".city-btn").forEach((e=>e.classList.remove("active"))),e.classList.add("active")}finally{e.textContent=n,e.classList.remove("loading"),document.querySelectorAll(".city-btn").forEach((e=>{e.disabled=!1,e.style.cursor = "pointer"}))}}else await fetchHustleData(t)}else showError("Please enter a city name"),scrollToHustleOutput()}}))}));
 
 // Track current displayed hustles and city globally
 let currentDisplayedHustles = [];
@@ -1936,61 +1929,6 @@ function showHustleLoading(city) {
 
 // Store scroll position when menu opens
 let scrollPosition = 0;
-
-// Enhance mobile menu functionality to properly handle scrolling
-function setupMobileMenu() {
-    const menuToggle = document.getElementById('mobile-menu');
-    const navLinks = document.querySelector('.nav-links');
-    
-    if (!menuToggle || !navLinks) return;
-    
-    menuToggle.addEventListener('click', function() {
-        // Toggle active classes
-        this.classList.toggle('is-active');
-        navLinks.classList.toggle('active');
-        
-        // Handle body class and scroll position
-        if (!document.body.classList.contains('menu-open')) {
-            // Menu is opening
-            scrollPosition = window.pageYOffset;
-            document.body.classList.add('menu-open');
-            document.body.style.top = `-${scrollPosition}px`;
-        } else {
-            // Menu is closing
-            document.body.classList.remove('menu-open');
-            document.body.style.top = '';
-            window.scrollTo(0, scrollPosition);
-        }
-    });
-    
-    // Close menu when clicking a link
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', () => {
-            navLinks.classList.remove('active');
-            menuToggle.classList.remove('is-active');
-            
-            // Restore scroll position
-            document.body.classList.remove('menu-open');
-            document.body.style.top = '';
-            window.scrollTo(0, scrollPosition);
-        });
-    });
-    
-    // Close menu when clicking outside
-    document.addEventListener('click', function(event) {
-        if (navLinks.classList.contains('active') && 
-            !navLinks.contains(event.target) && 
-            !menuToggle.contains(event.target)) {
-            navLinks.classList.remove('active');
-            menuToggle.classList.remove('is-active');
-            
-            // Restore scroll position
-            document.body.classList.remove('menu-open');
-            document.body.style.top = '';
-            window.scrollTo(0, scrollPosition);
-        }
-    });
-}
 
 // Mobile menu setup with improved event handling
 function setupMobileMenu() {

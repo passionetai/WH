@@ -817,6 +817,9 @@
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       padding: 1rem 0;
       border-top: 1px solid rgba(0,0,0,0.05); /* Add separator */
+      z-index: 101; /* Ensure menu is above navbar/content */
+      height: calc(100vh - 55px); /* Fill screen below navbar */
+      overflow-y: auto; /* Allow scrolling if needed */
     }
   
     .nav-links.active {
