@@ -109,6 +109,20 @@
             <button id="get-hustle-btn" aria-label="Search for hustles in your city" tabindex="0">FIND MY HUSTLE</button>
         </div>
         
+        <!-- Inspiration Section -->
+        <section id="inspiration-section" aria-labelledby="inspiration-title">
+            <h3 id="inspiration-title" class="inspiration-title">Trending Hustle Ideas</h3>
+            <div class="inspiration-cards-container">
+                <!-- Placeholder for dynamically loaded cards -->
+                <div class="inspiration-card-placeholder">Loading ideas...</div>
+                <div class="inspiration-card-placeholder">Loading ideas...</div>
+                <div class="inspiration-card-placeholder">Loading ideas...</div>
+                 <!-- Data source placeholder -->
+                 <!-- [Gemini API: get_featured_hustles(count=3, format='summary')] -->
+            </div>
+        </section>
+        <!-- End Inspiration Section -->
+
         <h3 class="cities-title">Popular cities</h3>
         
         <div class="city-buttons-container" role="group" aria-label="Popular cities list">
@@ -181,6 +195,19 @@
         WeHustle It - Hustling Worldwide
     </footer>
 
+    <!-- Hustle Detail Modal -->
+    <div id="hustle-detail-modal" class="modal" hidden>
+        <div class="modal-overlay" aria-label="Close modal"></div>
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <button class="modal-close-btn" aria-label="Close modal">&times;</button>
+            <div id="modal-body">
+                <!-- Full hustle details will be loaded here -->
+                <div class="loading-spinner"></div> <!-- Loading indicator -->
+            </div>
+        </div>
+    </div>
+    <!-- End Modal -->
+
     <!-- Updated Scroll to Top Button -->
     <button class="scroll-top-btn" aria-label="Scroll back to top" tabindex="0">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
@@ -190,5 +217,6 @@
 
     <!-- JavaScript Files -->
     <script src="script.js"></script>
+    <script src="gemini-featured-hustles.js"></script>
 </body>
 </html>

@@ -1997,3 +1997,329 @@ document.addEventListener('DOMContentLoaded', function() {
     setupMobileMenu();
     // ... other existing code ...
 });
+
+// ---
+// Inspiration Section Logic
+// ---
+
+const inspirationContainer = document.querySelector('.inspiration-cards-container');
+const hustleModal = document.getElementById('hustle-detail-modal');
+const modalBody = document.getElementById('modal-body');
+const modalOverlay = hustleModal.querySelector('.modal-overlay');
+const modalCloseBtn = hustleModal.querySelector('.modal-close-btn');
+
+// --- Simulation Functions (Replace with actual API calls) ---
+
+// Keep track of previously shown featured hustles to ensure uniqueness
+const seenFeaturedHustles = new Set();
+
+// Simulates fetching featured hustle summaries
+// Placeholder for: [Gemini API: get_featured_hustles(count=3, format='summary')]
+async function simulateFetchFeaturedHustles() {
+    console.log("Simulating fetch for featured hustles...");
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 400)); 
+    
+    // Sample data - replace with actual API response structure
+    const hustles = [
+        {
+            id: 'feat-photo-lon',
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`, // Camera icon
+            title: 'Event Photographer',
+            location: 'London',
+            snippet: 'Capture memories at local events & parties.'
+        },
+        {
+            id: 'feat-guide-par',
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 11l0 6"></path><path d="M12 7l0-1"></path></svg>`, // Shield/Guide icon
+            title: 'Niche Walking Tours',
+            location: 'Paris',
+            snippet: 'Lead themed tours (history, food, art) off the beaten path.'
+        },
+        {
+            id: 'feat-bake-nyc',
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>`, // Whisk/Baking icon
+            title: 'Custom Celebration Cakes',
+            location: 'New York',
+            snippet: 'Bake and sell unique cakes for birthdays & special occasions.'
+        }
+    ];
+    // Randomize results slightly for refresh effect
+    return hustles.sort(() => 0.5 - Math.random());
+}
+
+// Helper function to get appropriate SVG icon based on type description
+function getIconSvgForType(iconType) {
+    // Lowercase and simplify the icon type
+    const type = (iconType || '').toLowerCase().trim();
+    
+    // Map of common keywords to SVG icons
+    const iconMap = {
+        // Photography/Camera related
+        camera: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
+        photo: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
+        
+        // Food related
+        food: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>`,
+        cook: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>`,
+        bake: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z"></path></svg>`,
+        
+        // Tech/Coding related
+        tech: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`,
+        code: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`,
+        computer: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`,
+        
+        // Travel/Location related
+        travel: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 11l0 6"></path><path d="M12 7l0-1"></path></svg>`,
+        map: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>`,
+        location: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 11l0 6"></path><path d="M12 7l0-1"></path></svg>`,
+        
+        // Pet related
+        pet: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.172C10 3.782 8.423 2.679 6.5 3c-2.823.47-4.113 6.006-4 7 .08.703 1.725 1.722 3.656 1 1.261-.472 1.96-1.45 2.344-2.5"></path><path d="M14.5 5.172c0-1.39 1.577-2.493 3.5-2.172 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.96-1.45-2.344-2.5"></path><path d="M8 14v.5"></path><path d="M16 14v.5"></path><path d="M11.25 16.25h1.5L12 17l-.75-.75Z"></path><path d="M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444c0-1.061-.162-2.2-.493-3.309m-9.243-6.082A8.801 8.801 0 0 1 12 5c.78 0 1.5.108 2.161.304"></path></svg>`,
+        dog: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.172C10 3.782 8.423 2.679 6.5 3c-2.823.47-4.113 6.006-4 7 .08.703 1.725 1.722 3.656 1 1.261-.472 1.96-1.45 2.344-2.5"></path><path d="M14.5 5.172c0-1.39 1.577-2.493 3.5-2.172 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.96-1.45-2.344-2.5"></path><path d="M8 14v.5"></path><path d="M16 14v.5"></path><path d="M11.25 16.25h1.5L12 17l-.75-.75Z"></path><path d="M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444c0-1.061-.162-2.2-.493-3.309m-9.243-6.082A8.801 8.801 0 0 1 12 5c.78 0 1.5.108 2.161.304"></path></svg>`,
+        
+        // Design related
+        design: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>`,
+        art: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>`,
+        
+        // Fitness related
+        fitness: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M15 10v4"></path><path d="M9 10v4"></path><path d="M12 8v8"></path></svg>`,
+        exercise: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M15 10v4"></path><path d="M9 10v4"></path><path d="M12 8v8"></path></svg>`,
+        
+        // Education related
+        teach: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10L4 6l8-4 8 4-8 4z"></path><path d="M4 6v6c0 3.314 3.582 6 8 6s8-2.686 8-6V6"></path><line x1="12" y1="22" x2="12" y2="16"></line></svg>`,
+        tutor: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10L4 6l8-4 8 4-8 4z"></path><path d="M4 6v6c0 3.314 3.582 6 8 6s8-2.686 8-6V6"></path><line x1="12" y1="22" x2="12" y2="16"></line></svg>`,
+        education: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10L4 6l8-4 8 4-8 4z"></path><path d="M4 6v6c0 3.314 3.582 6 8 6s8-2.686 8-6V6"></path><line x1="12" y1="22" x2="12" y2="16"></line></svg>`,
+    };
+    
+    // Try to match icon type with our map
+    for (const [key, svg] of Object.entries(iconMap)) {
+        if (type.includes(key)) {
+            return svg;
+        }
+    }
+    
+    // Default icon if no match
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+}
+
+// Fetches full details for a specific hustle ID from Gemini API
+// Implementation for: [Gemini API: get_hustle_details(id=hustleId)]
+async function simulateFetchFullHustleDetails(hustleId) {
+    console.log(`Fetching full details for hustle: ${hustleId}`);
+    
+    try {
+        // Extract information from the hustle ID to help with prompt
+        const [category, location] = hustleId.split('-');
+        
+        // Create a prompt for Gemini to generate detailed information
+        const prompt = `Generate detailed business information for a side hustle with ID "${hustleId}".
+        
+Based on this ID, create a comprehensive profile for a ${category} business in ${location || 'any location'}.
+
+Format your response with this HTML structure:
+<h3 id="modal-title">[Catchy Business Name (Location)]</h3>
+<div>
+  <p>[Detailed 2-3 sentence description of what this business does and why it's viable]</p>
+  <strong>Key Steps:</strong>
+  <ul>
+    <li>[Step 1 - be specific]</li>
+    <li>[Step 2 - be specific]</li>
+    <li>[Step 3 - be specific]</li>
+    <li>[Step 4 - be specific]</li>
+  </ul>
+  <strong>Potential Earnings:</strong> [Realistic income range with currency]
+</div>
+
+Make the content practical, realistic, and detailed enough for someone to actually start this business.`;
+
+        // Make the API call
+        const response = await fetch(`${GEMINI_CONFIG.API_URL}?key=${GEMINI_CONFIG.API_KEY}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                contents: [
+                    {
+                        parts: [
+                            { text: prompt }
+                        ]
+                    }
+                ],
+                safetySettings: [
+                    {
+                        category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                        threshold: "BLOCK_ONLY_HIGH"
+                    }
+                ],
+                generationConfig: {
+                    maxOutputTokens: 1024,
+                    temperature: 0.7,
+                    topP: 0.95,
+                    topK: 40
+                }
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        
+        // Extract HTML content
+        const titleMatch = text.match(/<h3[^>]*>(.*?)<\/h3>/s);
+        const contentMatch = text.match(/<div[^>]*>([\s\S]*?)<\/div>/s);
+        
+        if (titleMatch && contentMatch) {
+            return {
+                title: titleMatch[1],
+                content: contentMatch[1]
+            };
+        } else {
+            // If structure doesn't match, return the whole text as content
+            return {
+                title: 'Hustle Details',
+                content: text
+            };
+        }
+    } catch (error) {
+        console.error("Error fetching hustle details:", error);
+        // Return a graceful error message
+        return { 
+            title: 'Details Temporarily Unavailable',
+            content: '<p>We couldn\'t load the details for this hustle right now. Please try again later.</p>'
+        };
+    }
+}
+
+// --- Rendering Functions ---
+
+function renderFeaturedHustles(hustles) {
+    if (!inspirationContainer) return;
+    inspirationContainer.innerHTML = ''; // Clear existing placeholders or cards
+
+    if (!hustles || hustles.length === 0) {
+        inspirationContainer.innerHTML = '<p class="inspiration-error">Could not load inspiration ideas right now.</p>';
+        return;
+    }
+
+    hustles.forEach(hustle => {
+        const card = document.createElement('div');
+        card.className = 'inspiration-card';
+        card.setAttribute('data-hustle-id', hustle.id);
+        card.setAttribute('role', 'button'); // Make it clear it's interactive
+        card.setAttribute('tabindex', '0');   // Make it keyboard accessible
+        card.innerHTML = `
+            <div class="inspiration-card-icon">
+                ${hustle.icon || '<i>?</i>'} 
+            </div>
+            <div class="inspiration-card-content">
+                <h4>${hustle.title || 'Hustle Idea'}</h4>
+                ${hustle.location ? `<p>in ${hustle.location}</p>` : ''}
+                ${hustle.snippet ? `<span>${hustle.snippet}</span>` : ''}
+            </div>
+        `;
+        
+        // Add click listener to open modal
+        card.addEventListener('click', () => openHustleModal(hustle.id));
+        card.addEventListener('keydown', (event) => { // Add keyboard accessibility
+             if (event.key === 'Enter' || event.key === ' ') {
+                 openHustleModal(hustle.id);
+             }
+         });
+
+        inspirationContainer.appendChild(card);
+    });
+}
+
+// --- Modal Functions ---
+
+async function openHustleModal(hustleId) {
+    if (!hustleModal || !modalBody) return;
+
+    // Show modal and initial loader
+    modalBody.innerHTML = '<div class="loading-spinner"></div>'; 
+    hustleModal.hidden = false;
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    // Use a slight delay to allow the hidden attribute removal to register before transition starts
+    setTimeout(() => hustleModal.classList.add('is-visible'), 10);
+
+    try {
+        // Fetch full details
+        const details = await simulateFetchFullHustleDetails(hustleId);
+        
+        // Display details in modal
+        modalBody.innerHTML = `
+            <h3 id="modal-title">${details.title}</h3>
+            <div>${details.content}</div>
+        `;
+    } catch (error) {
+        console.error("Error fetching hustle details:", error);
+        modalBody.innerHTML = '<p class="error-text">Could not load details. Please try again later.</p>';
+    }
+}
+
+function closeModal() {
+    if (!hustleModal) return;
+    hustleModal.classList.remove('is-visible');
+    document.body.style.overflow = ''; // Restore background scrolling
+    
+    // Wait for transition to finish before hiding and clearing
+    hustleModal.addEventListener('transitionend', () => {
+        hustleModal.hidden = true;
+        modalBody.innerHTML = ''; // Clear content after hiding
+    }, { once: true });
+}
+
+// --- Event Listeners & Interval ---
+
+// Close modal listeners
+if (modalOverlay && modalCloseBtn) {
+    modalOverlay.addEventListener('click', closeModal);
+    modalCloseBtn.addEventListener('click', closeModal);
+}
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && hustleModal.classList.contains('is-visible')) {
+        closeModal();
+    }
+});
+
+// Fetch and render featured hustles on initial load
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const initialHustles = await simulateFetchFeaturedHustles();
+        renderFeaturedHustles(initialHustles);
+    } catch (error) {
+        console.error("Failed to load initial featured hustles:", error);
+        if (inspirationContainer) {
+            inspirationContainer.innerHTML = '<p class="inspiration-error">Failed to load initial ideas.</p>';
+        }
+    }
+});
+
+// Refresh featured hustles every 5 minutes
+const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
+setInterval(async () => {
+    console.log("Refreshing featured hustles...");
+    try {
+        const refreshedHustles = await simulateFetchFeaturedHustles();
+        renderFeaturedHustles(refreshedHustles);
+    } catch (error) {
+        console.error("Failed to refresh featured hustles:", error);
+        // Optionally display a subtle error or just log it
+    }
+}, REFRESH_INTERVAL);
+
+// --- End Inspiration Section Logic ---
+
+
+// Original script content continues below...
+// Make sure this new code doesn't conflict with existing variable names or functions
+
+// Example: Ensure existing DOMContentLoaded listener is handled correctly
+// If an existing listener exists, merge the logic or call the new function from within it.
+
+// (Rest of the original script.js code...)
