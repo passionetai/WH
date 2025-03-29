@@ -2145,35 +2145,62 @@ function setupFeaturedHustleCardListeners() {
     
     cards.forEach(card => {
         card.addEventListener('click', async function() {
-            const hustleName = this.getAttribute('data-hustle-name');
-            const location = this.getAttribute('data-location');
-            const description = this.getAttribute('data-description');
-            
-            // Show loading state in the popup
-            if (popupContent) {
+            // Check screen width
+            const isMobile = window.innerWidth <= 768;
+
+            if (isMobile) {
+                // --- Mobile Behavior: Trigger Trending Search ---
+                const location = this.getAttribute('data-location');
+                const quickCityInput = document.getElementById('quick-city-input');
+                const quickSearchBtn = document.getElementById('quick-search-btn');
+                const trendingOutputSection = document.getElementById('trending-hustle-output');
+
+                if (location && quickCityInput && quickSearchBtn) {
+                    quickCityInput.value = location;
+                    quickSearchBtn.click(); // This triggers fetchAndRenderTrendingHustles
+
+                    if (trendingOutputSection) {
+                        trendingOutputSection.style.display = 'block';
+                        setTimeout(() => {
+                            trendingOutputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+                    }
+                } else {
+                    console.warn("Could not find elements for mobile featured card click.");
+                }
+
+            } else {
+                // --- Desktop Behavior: Show Popup ---
+                const hustleName = this.getAttribute('data-hustle-name');
+                const location = this.getAttribute('data-location');
+                const description = this.getAttribute('data-description');
+
+                // Ensure popup elements exist before proceeding
+                if (!popupOverlay || !popupContent) {
+                    console.error("Popup elements not found for desktop view.");
+                    return;
+                }
+
+                // Show loading state in the popup
                 popupContent.innerHTML = `
                     <div class="loading-spinner" style="margin: 40px auto; text-align: center;">
                         <div class="loader-circle"></div>
                         <p>Loading hustle details for "${hustleName}" in ${location}...</p>
                     </div>
                 `;
-                
-                // Show the popup
                 popupOverlay.classList.add('active');
-                // Disable body scroll when popup is open
-                document.body.style.overflow = 'hidden';
-            }
-            
-            try {
-                // More structured prompt with clear formatting instructions
-                const hustlePrompt = `Create a complete hustle opportunity profile for "${hustleName}" in ${location}. 
+                document.body.style.overflow = 'hidden'; // Disable body scroll
+
+                try {
+                    // Prompt for full hustle details
+                    const hustlePrompt = `Create a complete hustle opportunity profile for "${hustleName}" in ${location}.
 Brief description: ${description || "A local business opportunity"}
 
 Follow this EXACT format with NO DEVIATIONS:
 
 Name: ${hustleName}
 
-Executive Summary: 
+Executive Summary:
 [2-3 sentences describing the hustle in detail]
 
 Difficulty: [Easy/Medium/Hard]
@@ -2208,47 +2235,31 @@ Risk Analysis:
   Solution: [specific approach]
 - Challenge: [specific issue]
   Solution: [specific approach]`;
-                
-                // Call Gemini API to get the full hustle details
-                const response = await fetch(`${GEMINI_CONFIG.API_URL}?key=${GEMINI_CONFIG.API_KEY}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: hustlePrompt }]
-                        }],
-                        safetySettings: [{
-                            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-                            threshold: "BLOCK_ONLY_HIGH"
-                        }],
-                        generationConfig: {
-                            maxOutputTokens: 1024,
-                            temperature: 0.7,
-                            topP: 0.9,
-                            topK: 40
-                        }
-                    })
-                });
+                    
+                    // Call Gemini API
+                    const response = await fetch(`${GEMINI_CONFIG.API_URL}?key=${GEMINI_CONFIG.API_KEY}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: hustlePrompt }] }],
+                            safetySettings: [{ category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" }],
+                            generationConfig: { maxOutputTokens: 1024, temperature: 0.7, topP: 0.9, topK: 40 }
+                        })
+                    });
 
-                if (!response.ok) throw new Error(`API Error: ${response.status}`);
-                
-                const data = await response.json();
-                const textResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-                
-                // Parse the response into a hustle object
-                const hustle = parseHustleText(textResponse);
-                
-                // Render the hustle in the popup
-                renderHustleInPopup(hustle, location);
-                
-            } catch (error) {
-                console.error("Failed to load full hustle details:", error);
-                
-                // Fallback: Create a generic hustle based on the card data
-                const fallbackHustle = createFallbackHustleFromCard(hustleName, location, this.getAttribute('data-description'));
-                
-                // Render the fallback hustle in the popup
-                renderHustleInPopup(fallbackHustle, location);
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                    
+                    const data = await response.json();
+                    const textResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+                    
+                    const hustle = parseHustleText(textResponse);
+                    renderHustleInPopup(hustle, location);
+                    
+                } catch (error) {
+                    console.error("Failed to load full hustle details:", error);
+                    const fallbackHustle = createFallbackHustleFromCard(hustleName, location, this.getAttribute('data-description'));
+                    renderHustleInPopup(fallbackHustle, location);
+                }
             }
         });
     });
@@ -2748,15 +2759,17 @@ function setupQuickSearch() {
         quickSearchBtn.addEventListener('click', function() {
             const city = quickCityInput.value.trim();
             if (city) {
-                // Instead of triggering the main search, refresh the featured hustles
-                // for the specific city
-                refreshFeaturedHustlesForCity(city);
+                // Fetch and render the detailed trending hustles
+                fetchAndRenderTrendingHustles(city);
                 
-                // Show a small success message
-                quickSearchBtn.innerHTML = 'Refreshed!';
-                setTimeout(() => {
-                    quickSearchBtn.innerHTML = 'Find Trending Hustles';
-                }, 2000);
+                // Optional: Scroll to the trending output section
+                const trendingOutputSection = document.getElementById('trending-hustle-output');
+                if (trendingOutputSection) {
+                    trendingOutputSection.style.display = 'block'; // Ensure it's visible
+                    setTimeout(() => { // Allow time for display change
+                        trendingOutputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                }
             } else {
                 // Show a small hint if empty
                 quickCityInput.placeholder = "Please enter a city";
@@ -2775,58 +2788,53 @@ function setupQuickSearch() {
     }
 }
 
-// Function to refresh featured hustles for a specific city
-async function refreshFeaturedHustlesForCity(city) {
-    const inspirationSection = document.getElementById('inspiration-section');
-    if (!inspirationSection) return;
+// Global variable to store the last searched trending city
+let lastTrendingCity = "";
+
+// Function to fetch and render trending hustles (modified from refreshFeaturedHustlesForCity)
+async function fetchAndRenderTrendingHustles(city) {
+    lastTrendingCity = city; // Store the city for retry/refresh
+    const trendingOutput = document.getElementById('trending-hustle-output');
+    const loadingState = document.getElementById('trending-loading-state');
+    const errorState = document.getElementById('trending-error-state');
+    const noResultsState = document.getElementById('trending-no-results');
+    const refreshBtn = document.getElementById('refresh-trending-btn');
+
+    if (!trendingOutput || !loadingState || !errorState || !noResultsState || !refreshBtn) {
+        console.error("Missing required elements for trending hustle output.");
+        return;
+    }
+
+    // Show loading state and hide others
+    trendingOutput.style.display = 'block';
+    loadingState.hidden = false;
+    errorState.hidden = true;
+    noResultsState.hidden = true;
+    trendingOutput.innerHTML = ''; // Clear previous cards
+    trendingOutput.appendChild(loadingState); // Re-append loading state
     
-    const cardsContainer = inspirationSection.querySelector('.inspiration-cards-container');
-    if (!cardsContainer) return;
-    
-    // Add loading indicator to the cards container
-    cardsContainer.innerHTML = `
-        <div style="text-align: center; padding: 30px; width: 100%;">
-            <div class="loading-spinner" style="margin: 0 auto 15px;"></div>
-            <p>Finding trending hustles in ${city}...</p>
-        </div>
+    // Disable refresh button during load
+    refreshBtn.disabled = true;
+    refreshBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spinning">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/>
+        </svg>
+        Loading...
     `;
-    
+
     try {
-        // Create a more specific prompt that targets the city
+        // Prompt for TWO detailed hustles
+        const prompt = `Generate 2 highly unique and trending side hustles tailored to ${city}'s local economy, culture, demographics, and untapped opportunities. Avoid common ideas.
+
+Format EXACTLY like:\n\nName: [Business Name]\nExecutive Summary: [2-3 sentences describing the opportunity]\nDifficulty: [Easy/Medium/Hard]\nProfitability: [$/month range with specific numbers]\nCost: [Initial cost breakdown with specific numbers]\n\nKey Metrics:\n- Startup Time: [X weeks based on complexity, must be specific]\n- Break-even Point: [Y months with calculation based on costs and revenue]\n- Scalability: [Low/Medium/High with detailed explanation]\n\nAction Plan (First Month):\nWeek 1: [specific actionable milestone with measurable outcome]\nWeek 2: [specific actionable milestone with measurable outcome]\nWeek 3: [specific actionable milestone with measurable outcome]\nWeek 4: [specific actionable milestone with measurable outcome]\n\nResources:\n- Tools: [List exactly 3-5 specific tools with actual names and brief purpose]\n- Platforms: [List exactly 2-3 specific platforms with actual names]\n- Communities: [1 specific local community in ${city} + 1 specific online community]\n\nMonetization:\n1. [Primary revenue stream with exact pricing and volume estimates]\n2. [Secondary revenue stream with exact pricing and volume estimates]\n3. [Additional revenue stream with exact pricing and volume estimates]\n\nRisk Analysis:\n- Challenge: [specific issue] → Impact: [quantifiable effect]\n  Solution: [action 1] + [action 2] → Expected: [% improvement]\n- Challenge: [specific issue] → Impact: [quantifiable effect]\n  Solution: [action 1] + [action 2] → Expected: [% improvement]\n\nCRITICAL INSTRUCTION: You MUST provide complete, specific, and realistic details for EVERY section of BOTH hustles.`;
+
         const response = await fetch(`${GEMINI_CONFIG.API_URL}?key=${GEMINI_CONFIG.API_KEY}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: `Generate 3 trending hustle ideas specifically for ${city} in this EXACT format (nothing before or after):
-                        
-1. Hustle: [hustle name appropriate for ${city}]
-   Location: ${city}
-   Description: [single short sentence explaining why this is a good hustle for ${city}]
-   Icon: [one of: camera, map-pin, code, paint, coffee, book, truck, leaf, music]
-
-2. Hustle: [different hustle name appropriate for ${city}]
-   Location: ${city}
-   Description: [single short sentence explaining why this is a good hustle for ${city}]
-   Icon: [one of: camera, map-pin, code, paint, coffee, book, truck, leaf, music]
-
-3. Hustle: [different hustle name appropriate for ${city}]
-   Location: ${city}
-   Description: [single short sentence explaining why this is a good hustle for ${city}]
-   Icon: [one of: camera, map-pin, code, paint, coffee, book, truck, leaf, music]`
-                    }]
-                }],
-                safetySettings: [{
-                    category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-                    threshold: "BLOCK_ONLY_HIGH"
-                }],
-                generationConfig: {
-                    maxOutputTokens: 350,
-                    temperature: 1.0,
-                    topP: 0.9,
-                    topK: 40
-                }
+                contents: [{ parts: [{ text: prompt }] }],
+                safetySettings: [{ category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" }],
+                generationConfig: { maxOutputTokens: 1200, temperature: 1.1, topP: 0.9, topK: 50 } // Adjusted tokens for 2 hustles
             })
         });
 
@@ -2835,61 +2843,113 @@ async function refreshFeaturedHustlesForCity(city) {
         const data = await response.json();
         const textResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
         
-        // Parse the response
-        const hustleItems = textResponse.split(/\d+\.\s+/).filter(item => item.trim().length > 0);
+        // Parse the response using the existing parser
+        const hustles = parseHustles(textResponse, city);
         
-        if (hustleItems && hustleItems.length > 0) {
-            // Clear existing cards
-            cardsContainer.innerHTML = '';
-            
-            // Process each hustle idea
-            hustleItems.forEach(item => {
-                const hustleMatch = item.match(/Hustle:\s*(.+?)(?:\n|$)/);
-                const locationMatch = item.match(/Location:\s*(.+?)(?:\n|$)/);
-                const descriptionMatch = item.match(/Description:\s*(.+?)(?:\n|$)/);
-                const iconMatch = item.match(/Icon:\s*(.+?)(?:\n|$)/);
-                
-                if (hustleMatch && locationMatch && descriptionMatch) {
-                    const hustleName = hustleMatch[1].trim();
-                    const location = locationMatch[1].trim();
-                    const description = descriptionMatch[1].trim();
-                    const icon = (iconMatch && iconMatch[1].trim()) || "camera";
-                    
-                    // Create card with the data
-                    createFeaturedHustleCard(hustleName, location, description, icon, cardsContainer);
-                }
+        // Hide loading state
+        loadingState.hidden = true;
+
+        if (hustles && hustles.length > 0) {
+            // Create a container for the cards
+            const cardsContainer = document.createElement('div');
+            cardsContainer.className = 'hustle-cards-container trending-cards'; // Add specific class
+            trendingOutput.appendChild(cardsContainer);
+
+            // Create heading
+            const heading = document.createElement("h3");
+            heading.className = "hustles-heading"; // Reuse existing style
+            heading.textContent = `Trending Hustles in ${city}`;
+            cardsContainer.appendChild(heading);
+
+            // Create cards grid container
+            const cardsGrid = document.createElement("div");
+            cardsGrid.classList.add("cards-grid", "two-column-grid"); // Add class for 2 columns
+            cardsContainer.appendChild(cardsGrid);
+
+            // Render the first two hustles using createHustleCard
+            hustles.slice(0, 2).forEach((hustle, index) => {
+                const card = createHustleCard(hustle, city, true); // Reuse existing card creation
+                // Ensure buttons have correct index relative to the *displayed* hustles (0 or 1)
+                card.querySelectorAll('[data-hustle-index]').forEach(btn => btn.setAttribute('data-hustle-index', index));
+                cardsGrid.appendChild(card);
             });
-            
-            // Add a small indication this was refreshed for this city
-            const titleElement = document.getElementById('inspiration-title');
-            if (titleElement) {
-                titleElement.textContent = `Trending Hustle Ideas in ${city}`;
+
+            // Append the refresh button container (already in HTML, just ensure it's after cards)
+            const refreshBtnContainer = document.querySelector('#trending-hustle-output .refresh-button-container');
+            if (refreshBtnContainer) {
+                trendingOutput.appendChild(refreshBtnContainer);
             }
-            
-            // Update the placeholder of the quick search input
-            const quickCityInput = document.getElementById('quick-city-input');
-            if (quickCityInput) {
-                quickCityInput.placeholder = city;
-            }
-            
-            // Add click handlers to the cards
-            setupFeaturedHustleCardListeners();
+
+            // Setup listeners for the newly created cards (copy, save, share)
+            // Pass only the displayed hustles to the listener setup
+            setupHustleCardListeners(hustles.slice(0, 2));
+
         } else {
-            throw new Error("Failed to parse featured hustles");
+            // Show no results state
+            noResultsState.hidden = false;
+            trendingOutput.appendChild(noResultsState);
+            // Append refresh button even if no results
+            const refreshBtnContainer = document.querySelector('#trending-hustle-output .refresh-button-container');
+            if (refreshBtnContainer) trendingOutput.appendChild(refreshBtnContainer);
         }
     } catch (error) {
-        console.warn("Failed to load featured hustles for city:", error);
-        
-        // Show an error message
-        cardsContainer.innerHTML = `
-            <div style="text-align: center; padding: 30px; width: 100%;">
-                <p>Could not find trending hustles for ${city}. Please try again.</p>
-                <button onclick="loadFeaturedHustles()" style="margin-top: 15px; padding: 8px 15px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer;">
-                    Restore Default Hustles
-                </button>
-            </div>
+        console.error("Failed to load trending hustles:", error);
+        // Show error state
+        loadingState.hidden = true;
+        errorState.hidden = false;
+        trendingOutput.appendChild(errorState);
+        // Append refresh button even on error
+        const refreshBtnContainer = document.querySelector('#trending-hustle-output .refresh-button-container');
+        if (refreshBtnContainer) trendingOutput.appendChild(refreshBtnContainer);
+    } finally {
+        // Re-enable refresh button
+        refreshBtn.disabled = false;
+        refreshBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/>
+            </svg>
+            Refresh Trending Hustles
         `;
     }
 }
+
+// Function to handle retrying the trending search
+function retryTrendingSearch() {
+    if (lastTrendingCity) {
+        fetchAndRenderTrendingHustles(lastTrendingCity);
+    } else {
+        console.error("No city stored to retry trending search.");
+        // Optionally show an error message to the user
+        const errorState = document.getElementById('trending-error-state');
+        if(errorState) {
+            errorState.innerHTML = '<p>Cannot retry search. Please enter a city in the search box above.</p>';
+            errorState.hidden = false;
+        }
+    }
+}
+
+// Add event listener for the refresh trending button in DOMContentLoaded or setupMainPageListeners
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing listeners ...
+
+    const refreshTrendingBtn = document.getElementById('refresh-trending-btn');
+    if (refreshTrendingBtn) {
+        refreshTrendingBtn.addEventListener('click', () => {
+            if (lastTrendingCity) {
+                fetchAndRenderTrendingHustles(lastTrendingCity);
+            } else {
+                // Maybe prompt user to search first?
+                console.log("No city selected to refresh trending hustles.");
+                const quickCityInput = document.getElementById('quick-city-input');
+                if (quickCityInput) {
+                    quickCityInput.focus();
+                    quickCityInput.placeholder = "Enter city to refresh";
+                }
+            }
+        });
+    }
+});
+
+// ... rest of existing code ...
 
 // ... rest of existing code ...
