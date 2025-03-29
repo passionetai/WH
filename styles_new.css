@@ -279,8 +279,8 @@
     justify-content: center;
     text-align: center;
     overflow: hidden;
-    position: relative;
-    z-index: 1;
+    position: relative; /* Ensure relative positioning for the absolute buttons */
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .city-btn::before {
@@ -1376,7 +1376,7 @@
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
-    padding: 1rem;
+    padding: 0.8rem 1rem;
   }
   
   .nav-logo {
@@ -2255,9 +2255,9 @@ input:focus {
   
   /* Add subtle animations */
   @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% { transform: scale(0.98); opacity: 0.8; }
+    50% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.98); opacity: 0.8; }
   }
   
   .guide-step:nth-child(1) {
@@ -2492,7 +2492,7 @@ body.menu-open {
     gap: 1rem;
     border: 1px solid #e5e5ea; /* Subtle border */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); /* Subtle shadow */
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out;
 }
 
 .inspiration-card:hover {
@@ -2548,7 +2548,7 @@ body.menu-open {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 1100;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
@@ -2593,9 +2593,9 @@ body.menu-open {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: all 0.2s ease;
     z-index: 10;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    transition: all 0.2s ease;
 }
 
 .popup-close-btn:hover {
@@ -2841,7 +2841,8 @@ body.menu-open {
 @media (max-width: 768px) {
     .hustle-popup-container {
         width: 95%;
-        max-height: 90vh;
+        max-height: 40vh;
+        overflow-y: auto;
     }
     
     .popup-hustle-metrics {
@@ -3008,4 +3009,9 @@ body.menu-open {
     margin: 0 auto 1.5rem;
     max-width: 600px;
     line-height: 1.5;
+}
+
+/* Global Scroll Lock */
+body.body-scroll-locked {
+    overflow: hidden !important; /* Ensure this overrides other potential overflow styles */
 }

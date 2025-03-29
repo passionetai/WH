@@ -1,0 +1,67 @@
+/* Mobile Popup Fixes for Featured Hustle Cards */
+
+@media (max-width: 768px) {
+  /* Popup container styles for mobile */
+  .hustle-popup-container {
+    max-height: 40vh !important; /* Limit height to 40% of viewport as requested */
+    height: auto;
+    overflow-y: auto !important; /* Force scrollable content */
+    padding: 2rem 1.5rem !important; /* Slightly reduced padding for mobile */
+    width: 90% !important;
+    border-radius: 12px !important;
+    position: relative;
+  }
+  
+  /* Enhanced close button for mobile */
+  .popup-close-btn {
+    position: absolute !important;
+    top: 0.7rem !important;
+    right: 0.7rem !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 50% !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+    z-index: 10 !important; /* Ensure button stays on top */
+    padding: 0 !important;
+  }
+  
+  .popup-close-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  
+  /* Fix for popup overlay to ensure it's properly displayed and scrollable */
+  .hustle-popup-overlay.active {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 1100 !important;
+  }
+  
+  /* Adjustments for popup content to ensure it's readable on small screens */
+  .hustle-popup-content h3 {
+    font-size: 1.4rem !important;
+    margin-bottom: 0.7rem !important;
+  }
+  
+  .hustle-popup-content h4 {
+    font-size: 1.1rem !important;
+    margin-top: 1.2rem !important;
+    margin-bottom: 0.6rem !important;
+  }
+  
+  .hustle-popup-content p,
+  .hustle-popup-content li {
+    font-size: 0.95rem !important;
+    line-height: 1.5 !important;
+  }
+  
+  /* Improved scrollbar for mobile */
+  .hustle-popup-container::-webkit-scrollbar {
+    width: 5px !important;
+  }
+}
