@@ -74,35 +74,13 @@ function setupCalculator() {
             // Get business type from form or default
             const businessType = document.getElementById('initial-investment').placeholder || 'small business';
             
-            // Use fixed example values instead of API
-            // This is a temporary fix until the API integration is working properly
-            const exampleValues = getExampleValues(businessType);
-            
-            // Calculate results with example values
-            const weeklyEarnings = exampleValues.hoursPerWeek * exampleValues.hourlyRate;
-            const monthlyEarnings = weeklyEarnings * 4;
-            const breakEvenTime = exampleValues.initialInvestment / monthlyEarnings;
-            
-            // Simulate network delay for better UX
-            setTimeout(() => {
-                // Display example results
-                displaySimpleResults({
-                    initialInvestment: exampleValues.initialInvestment,
-                    hoursPerWeek: exampleValues.hoursPerWeek,
-                    hourlyRate: exampleValues.hourlyRate,
-                    weeklyEarnings,
-                    monthlyEarnings,
-                    breakEvenTime
-                }, resultsContainer);
-            }, 2000);
-            
-            /* Commented out until API integration is fixed
+            // Call the API to get values
             getCalculatorValues(businessType)
                 .then(values => {
                     // Calculate results
                     const weeklyEarnings = values.hoursPerWeek * values.hourlyRate;
                     const monthlyEarnings = weeklyEarnings * 4;
-                    const breakEvenTime = values.initialInvestment > 0 ? 
+                    const breakEvenTime = values.initialInvestment > 0 ?
                         values.initialInvestment / monthlyEarnings : 0;
                     
                     // Display simple results
@@ -118,7 +96,7 @@ function setupCalculator() {
                 .catch(error => {
                     console.error('Error getting calculator values:', error);
                     
-                    // Get example values based on business type
+                    // Get example values based on business type as fallback
                     const exampleValues = getExampleValues(businessType);
                     
                     // Calculate results with example values
@@ -136,7 +114,6 @@ function setupCalculator() {
                         breakEvenTime
                     }, resultsContainer);
                 });
-            */
         });
     }
 }
