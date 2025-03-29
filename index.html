@@ -25,6 +25,31 @@
     <link rel="stylesheet" href="styles.css">
     <!-- Particles.js CDN -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- Additional styles for cities section -->
+    <style>
+        .cities-section {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cities-title {
+            text-align: center;
+            margin: 2rem 0 0.5rem;
+            font-family: var(--font-heading);
+            color: var(--text-dark);
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .cities-subtitle {
+            color: var(--secondary-text);
+            font-size: 1rem;
+            margin: 0 auto 1.5rem;
+            max-width: 600px;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -113,18 +138,59 @@
         <section id="inspiration-section" aria-labelledby="inspiration-title">
             <h3 id="inspiration-title" class="inspiration-title">Trending Hustle Ideas</h3>
             <div class="inspiration-cards-container">
-                <!-- Placeholder for dynamically loaded cards -->
-                <div class="inspiration-card-placeholder">Loading ideas...</div>
-                <div class="inspiration-card-placeholder">Loading ideas...</div>
-                <div class="inspiration-card-placeholder">Loading ideas...</div>
+                <!-- Card 1 -->
+                <div class="inspiration-card">
+                    <div class="inspiration-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    </div>
+                    <div class="inspiration-card-content">
+                        <h4>Event Photographer</h4>
+                        <p>in London</p>
+                        <span>Capture memories at local events.</span>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="inspiration-card">
+                     <div class="inspiration-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 11l0 6"></path><path d="M12 7l0-1"></path></svg>
+                    </div>
+                    <div class="inspiration-card-content">
+                        <h4>Local Tour Guide</h4>
+                        <p>in Paris</p>
+                        <span>Show tourists the hidden gems.</span>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="inspiration-card">
+                     <div class="inspiration-card-icon">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    </div>
+                    <div class="inspiration-card-content">
+                        <h4>Home Baker</h4>
+                        <p>in New York</p>
+                        <span>Sell custom cakes and pastries.</span>
+                    </div>
+                </div>
                  <!-- Data source placeholder -->
-                 <!-- [Gemini API: get_featured_hustles(count=3, format='summary')] -->
+                 <!-- [Gemini API: get_featured_hustles(count=3, format='card')] -->
+            </div>
+            
+            <!-- Quick Search Container -->
+            <div class="quick-search-container">
+                <h4>Find Trending Hustles in your city</h4>
+                <div class="quick-search-form">
+                    <input type="text" placeholder="Your City" id="quick-city-input" aria-label="Enter your city name">
+                    <button id="quick-search-btn" aria-label="Find trending hustles for this city">Find Trending Hustles</button>
+                </div>
             </div>
         </section>
         <!-- End Inspiration Section -->
 
-        <h3 class="cities-title">Popular cities</h3>
-        
+        <div class="cities-section">
+            <h3 class="cities-title">Explore Popular Cities</h3>
+            <p class="cities-subtitle">Click any city to instantly generate unique hustle opportunities</p>
+        </div>
+
         <div class="city-buttons-container" role="group" aria-label="Popular cities list">
             <button class="city-btn" data-city="New York" aria-label="Search hustles in New York" tabindex="0">New York</button>
             <button class="city-btn" data-city="London" aria-label="Search hustles in London" tabindex="0">London</button>
@@ -195,19 +261,6 @@
         WeHustle It - Hustling Worldwide
     </footer>
 
-    <!-- Hustle Detail Modal -->
-    <div id="hustle-detail-modal" class="modal" hidden>
-        <div class="modal-overlay" aria-label="Close modal"></div>
-        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-            <button class="modal-close-btn" aria-label="Close modal">&times;</button>
-            <div id="modal-body">
-                <!-- Full hustle details will be loaded here -->
-                <div class="loading-spinner"></div> <!-- Loading indicator -->
-            </div>
-        </div>
-    </div>
-    <!-- End Modal -->
-
     <!-- Updated Scroll to Top Button -->
     <button class="scroll-top-btn" aria-label="Scroll back to top" tabindex="0">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
@@ -217,6 +270,20 @@
 
     <!-- JavaScript Files -->
     <script src="script.js"></script>
-    <script src="gemini-featured-hustles.js"></script>
+    
+    <!-- Hustle Details Popup Modal -->
+    <div id="hustle-popup-overlay" class="hustle-popup-overlay" aria-hidden="true">
+        <div class="hustle-popup-container" role="dialog" aria-labelledby="popup-title" aria-modal="true">
+            <button class="popup-close-btn" aria-label="Close popup">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="hustle-popup-content">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
 </body>
 </html>
