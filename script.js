@@ -49,6 +49,35 @@ const GEMINI_CONFIG={API_URL:"https://generativelanguage.googleapis.com/v1beta/m
     }
 }
 
+// Helper function to format profitability string
+function formatProfitability(profitString) {
+    if (!profitString || typeof profitString !== 'string') {
+        return 'N/A'; // Handle missing or invalid data
+    }
+    // Try to extract numbers, handling various formats like "$1,500 - $4,000/month" or "$500+"
+    const numbers = profitString.match(/\$?[\d,]+(?:\.\d+)?/g);
+
+    if (numbers && numbers.length === 2) {
+        // Parse numbers, removing $ and commas
+        const num1 = parseFloat(numbers[0].replace(/[$,]/g, ''));
+        const num2 = parseFloat(numbers[1].replace(/[$,]/g, ''));
+
+        // Basic correction logic: If num2 is much smaller than num1 (e.g., < 10), assume missing zeros
+        if (!isNaN(num1) && !isNaN(num2) && num2 < num1 && num2 < 10) {
+             // Very basic assumption: maybe it meant thousands?
+             // A more robust solution would require better API data or more complex heuristics.
+             // For now, let's just return the original but maybe log a warning
+             console.warn(`Potentially malformed profitability range: ${profitString}`);
+             return profitString; // Return original for now
+        }
+        // Re-format correctly parsed ranges for consistency (optional)
+        // return `$${num1.toLocaleString()} - $${num2.toLocaleString()}/month`;
+    }
+    // Return original string if parsing fails or it's not a range
+    return profitString;
+}
+
+
 // Function to create a hustle card element
 function createHustleCard(hustle, city, isGeminiResponse = true) {
     // Get index from the current context instead of using hustlesArray directly
@@ -101,7 +130,7 @@ function createHustleCard(hustle, city, isGeminiResponse = true) {
                 
                 <div class="hustle-metrics">
                     <span class="metric"><strong>Difficulty:</strong> ${hustle.difficulty}</span>
-                    <span class="metric"><strong>Profitability:</strong> <span class="profit-badge">${hustle.profitability}</span></span>
+                    <span class="metric metric-profitability"><strong>Profitability:</strong> <span class="profit-badge">${formatProfitability(hustle.profitability)}</span></span>
                     <span class="metric"><strong>Initial Cost:</strong> ${hustle.cost}</span>
                 </div>
                 

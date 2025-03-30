@@ -476,17 +476,17 @@
   .hustle-card {
     flex: 0 1 calc(33.333% - 11px);  /* Adjusted to account for new gap */
     min-width: 300px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: var(--card-bg); /* Solid white background */
+    /* backdrop-filter: blur(10px); Removed */
+    /* -webkit-backdrop-filter: blur(10px); Removed */
     border-radius: 16px;
     padding: 2rem;
     padding-top: 3rem; /* Increased top padding to make room for buttons */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07); /* Softer shadow */
     transform: translateY(0);
-    transition: var(--transition);
+    transition: all 0.3s ease; /* Use standard transition */
     position: relative; /* Ensure relative positioning for the absolute buttons */
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid #e5e5ea; /* Subtle border like inspiration cards */
   }
 
   /* Responsive adjustments */
@@ -509,10 +509,10 @@
   
   .hustle-card h3 {
     color: var(--primary-color);
-    font-size: 1.5rem;
+    font-size: 1.6rem; /* Slightly larger */
     text-align: center;
-    margin-top: 10px;
-    margin-bottom: 25px;
+    margin-top: 10px; /* Keep top margin */
+    margin-bottom: 15px; /* Reduced bottom margin */
     font-family: var(--font-heading);
     font-weight: 700;
     line-height: 1.3;
@@ -535,9 +535,11 @@
   
   .hustle-details p {
     margin: 0.8rem 0;
-    padding: 0.8rem;
+    padding: 0.8rem 0.8rem 0.8rem 1.2rem; /* Add left padding */
     background: #f8f9fa;
     border-radius: 8px;
+    border-left: 4px solid var(--primary-color); /* Add left border */
+    line-height: 1.6; /* Improve readability */
   }
   
   .hustle-steps ul {
@@ -721,9 +723,11 @@
 
 .metric-item {
     padding: 1rem;
-    background: #f8f9fa;
+    background: #ffffff; /* White background */
     border-radius: 8px;
     text-align: center;
+    border: 1px solid #e5e5ea; /* Subtle border */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03); /* Very subtle shadow */
 }
 
 .timeline {
@@ -734,9 +738,9 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 1rem;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 8px;
+    padding: 0.5rem 0; /* Adjust padding */
+    background: none; /* Remove background */
+    border-radius: 0; /* Remove radius */
 }
 
 .timeline-marker {
@@ -757,9 +761,10 @@
 }
 
 .resource-item {
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 8px;
+    padding: 0.5rem 0; /* Adjust padding */
+    background: none; /* Remove background */
+    border-radius: 0; /* Remove radius */
+    margin-bottom: 0.5rem; /* Add some space below each item */
 }
 
 .resource-item ul {
@@ -782,9 +787,9 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 1rem;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 8px;
+    padding: 0.5rem 0; /* Adjust padding */
+    background: none; /* Remove background */
+    border-radius: 0; /* Remove radius */
     align-items: center;
 }
 
@@ -906,48 +911,19 @@
 
 .hustle-diversity-tag {
     display: inline-block;
-    padding: 3px 8px;
+    padding: 4px 10px; /* Slightly more padding */
     border-radius: 12px;
-    font-size: 0.7em;
+    font-size: 0.75em; /* Slightly larger font */
     margin-right: 5px;
-    background: var(--accent-color-light);
+    background: var(--accent-color-light); /* Consistent light purple background */
+    color: var(--accent-color); /* Consistent purple text */
     text-transform: uppercase;
     font-weight: 600;
     letter-spacing: 0.5px;
+    border: none; /* Ensure no borders */
 }
 
-.tag-digital { 
-    background: #e3f2fd; 
-    color: #0277bd;
-}
-
-.tag-physical { 
-    background: #e8f5e9; 
-    color: #2e7d32;
-}
-
-.tag-hybrid {
-    background: #fff3e0;
-    color: #ef6c00;
-}
-
-.tag-b2b { 
-    border-left: 3px solid #673ab7; 
-    background: #f3e5f5;
-    color: #5e35b1;
-}
-
-.tag-b2c { 
-    border-left: 3px solid #ff5722; 
-    background: #ffebee;
-    color: #d32f2f;
-}
-
-.tag-mixed {
-    border-left: 3px solid #009688;
-    background: #e0f2f1;
-    color: #00796b;
-}
+/* Removed specific tag color/border rules */
 
 .hustle-heading {
   text-align: center;
@@ -1403,14 +1379,16 @@
 /* Media query for mobile responsiveness */
 @media (max-width: 768px) {
   .navbar {
-    flex-direction: column;
-    padding: 1rem;
+    flex-direction: row; /* Change to row */
+    justify-content: space-between; /* Space out logo and toggle */
+    align-items: center; /* Vertically align items */
+    padding: 0.8rem 1rem; /* Adjust padding */
     background: transparent; /* Ensure transparency in mobile view too */
     box-shadow: none; /* No shadow in mobile view */
   }
   
   .nav-logo {
-    margin-bottom: 1rem;
+    margin-bottom: 0; /* Remove bottom margin */
   }
   
   .nav-links {
@@ -1621,9 +1599,18 @@
 }
 
 .result-benefits li {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 0.8rem;
+    background: var(--card-bg); /* Solid white background */
+    padding: 1rem; /* Increase padding */
     border-radius: 8px;
+    border: 1px solid #e5e5ea; /* Subtle border */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Slight shadow */
+    transition: all 0.3s ease; /* For smooth animation */
+    margin-bottom: 0.75rem; /* Add space between items */
+}
+
+.result-benefits li:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .result-actions {
@@ -1636,24 +1623,30 @@
 
 /* Single hustle card in quiz results */
 .quiz-results .hustle-card {
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    padding: 1.5rem;
+    background: var(--card-bg); /* Solid white background */
+    border-radius: 16px; /* Match other cards */
+    padding: 2rem; /* Consistent padding */
     margin: 2rem 0;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07); /* Softer shadow */
     text-align: left;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    /* backdrop-filter: blur(5px); Removed */
+    border: 1px solid #e5e5ea; /* Subtle border */
 }
 
 .quiz-results .hustle-card h3 {
-    color: var(--primary-color);
+    color: var(--text-dark); /* Darker text */
     text-align: center;
-    margin-bottom: 1.5rem;
-    font-size: 1.3rem;
+    margin-bottom: 1rem; /* Reduced bottom margin */
+    font-size: 1.5rem; /* Increased size */
+    font-family: var(--font-heading); /* Consistent font */
+    font-weight: 600; /* Consistent weight */
     position: relative;
+    padding-bottom: 0.5rem; /* Space for border */
+    border-bottom: 1px solid #e5e5ea; /* Add subtle border like other sections */
 }
 
+/* Remove the :after pseudo-element as border-bottom is used now */
+/*
 .quiz-results .hustle-card h3:after {
     content: '';
     position: absolute;
@@ -1665,6 +1658,7 @@
     background: var(--primary-color);
     border-radius: 3px;
 }
+*/
 
 .quiz-results .timeline-marker {
     background: var(--primary-color);
@@ -1973,12 +1967,15 @@ input:focus {
 }
 
 .hustle-card h4 {
-  color: var(--primary-color);
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-top: 30px;
-  margin-bottom: 1rem;
-  font-family: 'Quicksand', sans-serif;
+  color: var(--text-dark); /* Darker text for better contrast */
+  font-size: 1.2rem; /* Slightly smaller */
+  font-weight: 600; /* Slightly less bold */
+  margin-top: 1.5rem; /* Consistent top margin */
+  margin-bottom: 0.8rem; /* Reduced bottom margin */
+  font-family: var(--font-heading); /* Use main heading font */
+  padding-bottom: 0.5rem; /* Space for border */
+  border-bottom: 1px solid #e5e5ea; /* Light grey bottom border */
+  text-align: left; /* Align left */
 }
 
 /* How to guide styles */
@@ -2976,9 +2973,10 @@ body.menu-open {
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease; /* Match general button transition */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     white-space: nowrap;
+    border-bottom: 2px solid #D1D1D6; /* Specific darker grey border for 3D */
 }
 
 #quick-search-btn:hover {
@@ -2991,6 +2989,7 @@ body.menu-open {
     transform: translateY(1px);
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
     background: #e0e0e0; /* Slightly darker background on active */
+    border-bottom: none; /* Remove border when pressed */
 }
 
 @media (max-width: 768px) {
@@ -3147,4 +3146,59 @@ body.menu-open {
     animation: seesaw 3s ease-in-out infinite;
     transform-origin: bottom center; /* Rotate around bottom center */
     z-index: 2; /* Ensure it's above card content if needed */
+}
+
+/* Quiz Results Card - Section Item Overrides */
+.quiz-results .hustle-card .timeline-item,
+.quiz-results .hustle-card .monetization-item,
+.quiz-results .hustle-card .resource-item,
+.quiz-results .hustle-card .risk-item {
+    background: none; /* Remove background */
+    padding-left: 0; /* Reset padding if needed */
+    padding-right: 0;
+    border-radius: 0; /* Remove radius */
+    box-shadow: none; /* Remove shadow if any */
+    border: none; /* Remove border if any */
+}
+
+/* Adjust specific item padding if needed */
+.quiz-results .hustle-card .timeline-item {
+    padding-left: 45px; /* Keep space for marker */
+}
+.quiz-results .hustle-card .monetization-item {
+     padding-left: 0; /* Reset padding */
+}
+.quiz-results .hustle-card .resource-item ul {
+    padding-left: 10px; /* Adjust list padding */
+}
+.quiz-results .hustle-card .risk-item {
+     padding: 0.5rem 0; /* Adjust padding */
+}
+
+/* Quiz Results Card - Metric Item Override */
+.quiz-results .hustle-card .popup-metric {
+    background: #f8f9fa; /* Light grey background */
+    color: var(--text-dark); /* Ensure text is dark */
+}
+.quiz-results .hustle-card .popup-metric svg {
+    stroke: var(--text-dark); /* Ensure icon is dark */
+}
+
+.result-benefits li:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Quiz Results Card - Profitability Metric Styling */
+.quiz-results .metric-profitability {
+    /* Optional: Add specific styling to the container span if needed */
+}
+.quiz-results .metric-profitability .profit-badge {
+    background-color: var(--success-color); /* Use success green */
+    color: white;
+    font-weight: 600;
+    font-size: 1em; /* Slightly larger relative to parent */
+    padding: 4px 8px; /* Adjust padding */
+    border-radius: 6px; /* Slightly more rounded */
+    display: inline-block; /* Ensure proper display */
 }
