@@ -146,7 +146,8 @@
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 24 24" fill="%23999"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
+    /* Updated SVG icon fill to primary color #007AFF */
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 24 24" fill="%23007AFF"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
     background-repeat: no-repeat;
     background-position: 16px center;
 }
@@ -157,31 +158,26 @@
 }
 
 #city-input:focus {
-    border-color: rgba(0, 122, 255, 0.5);
+    border-color: var(--primary-color); /* Use primary color for border */
     outline: none;
-    box-shadow: 0 8px 20px rgba(0, 122, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Consistent focus shadow */
     transform: translateY(-2px);
 }
 
 #city-input::placeholder {
     font-family: var(--font-primary);
-    color: #999;
+    color: var(--secondary-text); /* Use theme secondary text color */
 }
-  
-  #city-input:focus {
-    border-color: var(--primary-color);
-    outline: none;
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
-  }
   
   button {
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.2s ease; /* Faster transition */
     border: none;
     font-weight: 600;
     transform: scale(1);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 3px 5px rgba(0,0,0,0.1); /* Slightly more shadow */
     font-family: var(--font-primary);
+    border-bottom: 2px solid rgba(0,0,0,0.15); /* Subtle dark bottom border */
   }
   
   button:hover {
@@ -190,12 +186,13 @@
   }
   
   button:active {
-    transform: scale(0.98);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transform: translateY(1px); /* Move down slightly */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Keep smaller shadow */
+    border-bottom: none; /* Remove bottom border when pressed */
   }
   
   #get-hustle-btn {
-    background: var(--primary-color);
+    /* background: var(--primary-color); <-- Removed default background */
     color: white;
     padding: 1rem 2.5rem;
     border-radius: 12px;
@@ -210,6 +207,8 @@
     position: relative;
     overflow: hidden;
     z-index: 1;
+    background: transparent; /* Ensure no default background */
+    border-bottom: none; /* Override general button border */
   }
 
   #get-hustle-btn::before {
@@ -219,21 +218,24 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 50%, var(--secondary-color) 100%);
+    /* Use blue-to-purple gradient */
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
     background-size: 200% 200%;
-    opacity: 0;
+    opacity: 1; /* Visible by default */
     z-index: -1;
     transition: opacity 0.3s ease;
+    animation: gradientFlow 3s ease infinite; /* Animate by default */
   }
 
   #get-hustle-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    background: var(--primary-color); /* Add solid blue background on hover */
   }
 
   #get-hustle-btn:hover::before {
-    opacity: 1;
-    animation: gradientFlow 3s ease infinite;
+    opacity: 0; /* Hide gradient on hover */
+    /* animation: gradientFlow 3s ease infinite; <-- Removed animation on hover */
   }
 
   .cities-title {
@@ -269,9 +271,9 @@
     color: white;
     padding: 0.8rem;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Slightly adjusted shadow */
     font-family: var(--font-primary);
-    transition: all 400ms ease;
+    transition: all 0.2s ease; /* Faster transition for button press */
     width: 150px;
     height: 45px;
     display: flex;
@@ -281,6 +283,8 @@
     overflow: hidden;
     position: relative;
     z-index: 1;
+    border: none; /* Remove default border */
+    border-bottom: 3px solid #005CB8; /* Darker blue bottom border for 3D effect */
   }
 
   .city-btn::before {
@@ -319,12 +323,19 @@
     animation: gradientFlow 3s ease infinite;
   }
 
+  .city-btn:active {
+    transform: translateY(1px); /* Move down slightly to simulate press */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Smaller shadow when pressed */
+    border-bottom: none; /* Remove the bottom border when pressed */
+  }
+
   /* Ensure hover doesn't override active state */
   .city-btn.active {
     background: var(--secondary-color);
     color: white;
     box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
     transform: none;
+    border-bottom: none; /* Ensure no bottom border on active state */
   }
 
   .city-btn.active:hover {
@@ -345,6 +356,7 @@
     position: relative;
     top: 0 !important;
     transform: none !important;
+    border-bottom: none; /* Ensure no bottom border on loading state */
   }
 
   .city-btn.loading::before,
@@ -406,8 +418,9 @@
     border: none;
     border-radius: 30px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease; /* Match general button transition */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-bottom: none; /* Override general button border */
   }
 
   .refresh-btn:hover {
@@ -868,7 +881,8 @@
     padding: 0.5rem 1rem;
     border-radius: 4px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease; /* Match general button transition */
+    border-bottom: 2px solid #005CB8; /* Darker blue bottom border */
 }
 
 .reload-section-btn:hover {
@@ -1005,7 +1019,8 @@
 .copy-hustle-btn {
     background-color: var(--button-bg);
     color: var(--button-text);
-    border: 1px solid transparent;
+    border: 1px solid transparent; /* Keep top/side border transparent */
+    border-bottom: 2px solid #D1D1D6; /* Darker grey for 3D effect */
 }
 
 .copy-hustle-btn:hover {
@@ -1015,7 +1030,9 @@
 }
 
 .copy-hustle-btn:active {
-    transform: translateY(0);
+    transform: translateY(1px); /* Match general button active transform */
+    border-bottom: none; /* Remove bottom border when pressed */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Match general button active shadow */
 }
 
 .copy-hustle-btn.copied {
@@ -1029,7 +1046,8 @@
 .save-hustle-btn {
     background-color: var(--accent-color-light);
     color: var(--accent-color);
-    border: 1px solid var(--accent-color);
+    border: 1px solid var(--accent-color); /* Keep existing border */
+    border-bottom: 2px solid rgba(88, 86, 214, 0.6); /* Darker accent color for 3D */
 }
 
 .save-hustle-btn:hover {
@@ -1040,7 +1058,9 @@
 }
 
 .save-hustle-btn:active {
-    transform: translateY(0);
+    transform: translateY(1px); /* Match general button active transform */
+    border-bottom: 1px solid var(--accent-color); /* Keep top border, remove bottom */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Match general button active shadow */
 }
 
 .save-hustle-btn.saved {
@@ -1055,7 +1075,8 @@
 .share-hustle-btn {
     background-color: var(--secondary-button-bg);
     color: var(--secondary-button-text);
-    border: 1px solid transparent;
+    border: 1px solid transparent; /* Keep top/side border transparent */
+    border-bottom: 2px solid #C7C7CC; /* Darker grey for 3D effect */
 }
 
 .share-hustle-btn:hover {
@@ -1065,7 +1086,9 @@
 }
 
 .share-hustle-btn:active {
-    transform: translateY(0);
+    transform: translateY(1px); /* Match general button active transform */
+    border-bottom: none; /* Remove bottom border when pressed */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Match general button active shadow */
 }
 
 /* Filter Container Styles */
@@ -1248,8 +1271,10 @@
     border-radius: 50px;
     text-decoration: none;
     font-weight: bold;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease; /* Match general button transition */
     box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+    border: none; /* Ensure no other borders */
+    border-bottom: 3px solid #005CB8; /* Darker blue bottom border */
 }
 
 .back-to-home:hover {
@@ -1271,6 +1296,7 @@
     gap: 5px;
     cursor: pointer;
     transition: all 0.2s ease;
+    border-bottom: 2px solid #D1D1D6; /* Darker grey for 3D effect */
 }
 
 .delete-hustle-btn svg {
@@ -1286,7 +1312,9 @@
 }
 
 .delete-hustle-btn:active {
-    transform: translateY(0);
+    transform: translateY(1px); /* Match general button active transform */
+    border-bottom: none; /* Remove bottom border when pressed */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Match general button active shadow */
 }
 
 /* Style back link on saved page */
@@ -1316,13 +1344,13 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem 1.5rem;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: transparent; /* Changed from rgba(255, 255, 255, 0.8) to transparent */
+    backdrop-filter: none; /* Removed blur effect */
+    -webkit-backdrop-filter: none; /* Removed webkit blur effect */
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: none; /* Removed box shadow */
     transition: all 0.3s ease;
 }
 
@@ -1368,7 +1396,7 @@
 }
 
 .nav-links li a[aria-current="page"] {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
     color: white;
 }
 
@@ -1377,6 +1405,8 @@
   .navbar {
     flex-direction: column;
     padding: 1rem;
+    background: transparent; /* Ensure transparency in mobile view too */
+    box-shadow: none; /* No shadow in mobile view */
   }
   
   .nav-logo {
@@ -1445,21 +1475,6 @@
     font-weight: bold;
     color: var(--accent-color);
     display: inline-block;
-}
-
-.share-hustle-btn {
-  background: #E5E5EA;
-  color: #1D1D1F;
-  border: none;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.share-hustle-btn:hover {
-  background: #D5D5DA;
 }
 
 /* Quiz Styles */
@@ -1550,9 +1565,10 @@
     border-radius: 50px;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease; /* Match general button transition */
     font-size: 1.1rem;
     box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+    border-bottom: 3px solid #005CB8; /* Darker blue bottom border */
 }
 
 .cta-button:hover {
@@ -1666,9 +1682,10 @@
     padding: 0.8rem 1.5rem;
     border-radius: 50px;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease; /* Match general button transition */
     border: none;
     cursor: pointer;
+    border-bottom: 3px solid #005CB8; /* Darker blue bottom border */
 }
 
 .action-btn:hover {
@@ -2470,10 +2487,12 @@ body.menu-open {
 
 .inspiration-title {
     text-align: center;
-    font-size: 1.5rem; /* Slightly smaller than main titles */
-    color: var(--secondary-text); /* Use a less prominent color */
-    margin-bottom: 1.5rem;
-    font-weight: 500;
+    font-size: 1.8rem; /* Match cities-title */
+    color: var(--text-dark); /* Match cities-title */
+    margin-top: 2rem; /* Add top margin */
+    margin-bottom: 1.5rem; /* Keep existing bottom margin */
+    font-weight: 600; /* Match cities-title */
+    font-family: var(--font-heading); /* Match cities-title */
 }
 
 .inspiration-cards-container {
@@ -2493,6 +2512,7 @@ body.menu-open {
     border: 1px solid #e5e5ea; /* Subtle border */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); /* Subtle shadow */
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    position: relative; /* Added for positioning the click button */
 }
 
 .inspiration-card:hover {
@@ -2901,16 +2921,19 @@ body.menu-open {
 /* Quick Search Container Styles */
 .quick-search-container {
     margin-top: 2.5rem;
-    padding: 0 1rem;
+    padding: 2rem; /* Adjusted padding */
     text-align: center;
     max-width: 650px;
     margin-left: auto;
     margin-right: auto;
+    background-color: var(--primary-color); /* Set background to primary blue */
+    border-radius: 12px; /* Add rounded corners */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
 }
 
 .quick-search-container h4 {
     font-size: 1.4rem;
-    color: var(--text-dark);
+    color: white; /* Changed to white for contrast */
     margin-bottom: 1rem;
     font-weight: 500;
 }
@@ -2945,8 +2968,8 @@ body.menu-open {
 }
 
 #quick-search-btn {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
-    color: white;
+    background: white; /* Changed background to white */
+    color: var(--primary-color); /* Changed text color to blue */
     border: none;
     border-radius: 30px;
     padding: 0.75rem 1.5rem;
@@ -2961,11 +2984,13 @@ body.menu-open {
 #quick-search-btn:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background: #f0f0f0; /* Slightly darker background on hover */
 }
 
 #quick-search-btn:active {
     transform: translateY(1px);
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+    background: #e0e0e0; /* Slightly darker background on active */
 }
 
 @media (max-width: 768px) {
@@ -3008,4 +3033,118 @@ body.menu-open {
     margin: 0 auto 1.5rem;
     max-width: 600px;
     line-height: 1.5;
+}
+
+/* Quiz Callout Section Styles */
+.quiz-callout-section {
+    padding: 3rem 1rem; /* Add vertical padding */
+    margin: 3rem auto; /* Center and add vertical margin */
+    max-width: 900px; /* Limit width */
+}
+
+.quiz-callout-container {
+    background-color: var(--card-bg);
+    border: 2px solid var(--primary-color);
+    border-radius: 16px;
+    padding: 2.5rem 2rem; /* Inner padding */
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0, 122, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.quiz-callout-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 122, 255, 0.15);
+}
+
+.quiz-callout-container h2 {
+    font-size: 1.8rem;
+    color: var(--text-dark);
+    margin-bottom: 0.75rem;
+    font-family: var(--font-heading);
+    font-weight: 600;
+}
+
+.quiz-callout-container p {
+    color: var(--secondary-text);
+    font-size: 1rem;
+    margin-bottom: 1.75rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+.quiz-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    padding: 1rem 2.5rem;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: none; /* Override general button border for gradient */
+}
+
+.quiz-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.05);
+}
+
+.quiz-btn span {
+    margin-left: 5px;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.quiz-btn:hover span {
+    transform: translateX(4px);
+}
+
+#quick-city-input::placeholder {
+    color: #666; /* Darker grey for better contrast on light background */
+    opacity: 1; /* Ensure placeholder is fully opaque */
+}
+
+/* Inspiration Card - Ensure relative positioning for child button */
+.inspiration-card {
+    position: relative; /* Added for positioning the click button */
+}
+
+/* Seesaw animation for the decorative button */
+@keyframes seesaw {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(5deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+}
+
+/* Decorative 'Click' button on inspiration cards */
+.inspiration-click-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: var(--button-bg); /* Use theme button background */
+    color: var(--button-text); /* Use theme button text color */
+    padding: 2px 6px;
+    font-size: 0.6rem; /* Tiny font */
+    font-weight: 600;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    cursor: default; /* Not interactive */
+    pointer-events: none; /* Prevent interaction */
+    animation: seesaw 3s ease-in-out infinite;
+    transform-origin: bottom center; /* Rotate around bottom center */
+    z-index: 2; /* Ensure it's above card content if needed */
 }

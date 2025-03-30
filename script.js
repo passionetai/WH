@@ -2161,6 +2161,7 @@ function createFeaturedHustleCard(hustleName, location, description, iconType, c
     cardDiv.setAttribute('data-description', description);
     
     cardDiv.innerHTML = `
+        <span class="inspiration-click-btn">Click</span> <!-- Added decorative button -->
         <div class="inspiration-card-icon">
             ${iconSvg}
         </div>
